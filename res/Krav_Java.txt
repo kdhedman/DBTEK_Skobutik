@@ -1,0 +1,33 @@
+Java
+För G:
+Skriv följande java-program:
+• För att förbereda inför nästa punkt, lägg till en kolumn för lösenord i Customer-tabellen
+    (du behöver inte använda kryptering i denna uppgift, det är utanför kursens range,
+    även om man i verkligheten alltid vill att lösenord ska lagras krypterade i databaser)
+• Skapa ett gränssnitt till din procedur AddToCart
+    (alltså ett program som låter användaren lägga in produkter i en beställning).
+    Ett krav är att användaren aldrig ska behöva se databasens interna id:n.
+    Du bestämmer själv om du vill göra ett visuellt gränssnitt, eller bara ha ett gränssnitt via kommandoraden.
+    Ett gränssnitt via kommandoraden kan se ut enligt följande:
+        • användaren blir promptad att skriva sitt användarnamn och lösenord (så att vi vet vilken användare som beställer).
+        • Prompta sedan användaren genom att skriva ut alla produkter som finns i lager, användaren får välja en.
+        • Beroende på hur du har modellerat din databas kan användaren behöva promptas flera gånger
+          för att specifik produkt ska kunna pekas ut (kanske färg, storlek etc. måste väljas separat?).
+          Skriv den kod som behövs för att detta ska funka med just din databas.
+        • Anropa sedan din stored procedure så att produkten läggs in i beställningen.
+• Se till att användaren får återkoppling om allt gick bra eller om fel uppstod när en produkt lades till i beställningen.
+• Användaren ska även kunna välja att skriva ut alla produkter som ingår i hens beställning.
+
+För VG:
+• Uppfyll samtliga krav för G.
+• Skapa en komplett objektmodell för din relationsdatabas.
+    Dvs skapa Java-klasser som motsvarar alla tabeller i din databas och
+    skapa upp de samband som finns tabellerna emellan på ett objektorienterat sätt i javakoden.
+• Skapa funktionalitet så att användaren kan ge betyg och kommentera på en produkt.
+• Skapa funktionalitet så att användaren kan se genomsnittligt betyg samt kommentarer för en produkt.
+
+All kod i denna uppgift ska skrivas manuellt – ingen automatgenererad kod får förekomma!
+Sql-filerna ska lämnas senast morgonen den 25 februari i inlämningsmappen för inlämningsuppgift 2 på portalen,
+helst innan redovisningarna börjar.
+Java-filerna ska laddas upp på GitHub, senast samma tid. Redovisning sker under 25e och 26e februari.
+Denna uppgift görs enskilt eller i par. Lycka till!

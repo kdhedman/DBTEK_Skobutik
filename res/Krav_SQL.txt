@@ -1,0 +1,26 @@
+För G:
+Du behöver nu modifiera din databaslösning genom att börja hålla reda på hur många skor av varje sort som du lagerhåller.
+Lägg dig funktionalitet i din databaslösning för att kunna göra detta.
+Skapa en stored procedure ”AddToCart”. Denna procedur skall ta kundid, beställningsid och produktid som inparametrar.
+(Beroende på hur din implementation ser ut kan du behöva använda andra värden som inparametrar,
+justera i så fall parameterlistan för att kunna peka ut en produkt, kund och beställning.)
+
+AddToCart ska uppfylla följande:
+• Om beställningen inte finns eller om vi skickar in null som beställningsid ska en ny beställning skapas och produkten läggas till i den.
+• Om beställningen redan finns ska produkten läggas till i beställningen.
+• Om beställningen finns och produkten redan finns i den ska vi lägga till ytterligare ett exemplar av produkten i beställningen.
+• För varje produkt som blir tillagd i en beställning ska lagerantalet av produkten minska.
+• Använd dig av transaktioner och felhantering
+
+Vi vill även kunna kolla upp hur ofta en viss produkt säljer slut.
+Skapa därför en trigger som lägger in en rad i en tabell som heter Slutilager om en produkt tar slut i lager.
+Slutilager skall innehålla datum och produktId.
+
+För VG:
+Alla ovanstående punkter som krävs för G ska vara uppfyllda.
+Om det inte redan finns betyg och kommentarer inlagda för produkter, lägg in data för dessa.
+• Skapa en funktion som tar ett produktId som parameter och returnerar medelbetyget för den produkten.
+  Om du inte har sifferbetyg sedan innan, lägg till dessa, så att en siffra motsvarar ett av de skriftliga betygsvärdena.
+• Skapa en vy som visar medelbetyget i siffror och i text för samtliga produkter
+  (om en produkt inte har fått något betyg så skall den ändå visas, med null eller tomt värde, i medelbetyg).
+• Skapa en stored procedure ”Rate” som lägger till ett betyg och en kommentar på en specifik produkt för en specifik kund.
