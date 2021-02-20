@@ -13,9 +13,9 @@ public class Repository {
         p.load(new FileInputStream("res/dbc.properties"));
     }
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException, SQLException {
         Repository repo = new Repository();
-        repo.showInventory("select * from skomodell");
+        System.out.println(repo.getSkomodellFromDatabase(1));
     }
 
     private void testingDBConnection() throws ClassNotFoundException, IOException {
@@ -55,7 +55,7 @@ public class Repository {
         }
 
     }
-    private ResultSet getData(String query) throws ClassNotFoundException, SQLException {
+     String getSkomodellFromDatabase(int index) throws ClassNotFoundException, SQLException {
         Class.forName("com.mysql.cj.jdbc.Driver");
         try(Connection con = DriverManager.getConnection(
                 p.getProperty("connection"),
@@ -63,14 +63,17 @@ public class Repository {
                 p.getProperty("pw")))
         {
             Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-           return stmt.executeQuery(query);
+
+           ResultSet rs = stmt.executeQuery("Select skomodell from skomodell where id = "+index);
+             rs.next();
+             return rs.getString("skomodell");
 
         }
 
 }
-private String getSkomodellFromDatabase(int skomodellId) throws SQLException, ClassNotFoundException {
-        ResultSet rs = getData("Select from skomodell where id = ?");
-        rs.next();
-       return rs.getString("skomodell");
-}
+//private String getSkomodellFromDatabase(int skomodellId) throws SQLException, ClassNotFoundException {
+//        ResultSet rs = getData("Select skomodell from skomodell where id = ",skomodellId);
+//       rs.next();
+//       return rs.getString("skomodell");
+//}
 }

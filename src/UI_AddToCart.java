@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 
 
 public class UI_AddToCart {
@@ -14,13 +15,12 @@ public class UI_AddToCart {
     public UI_AddToCart() throws IOException {
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SQLException, ClassNotFoundException {
         UI_AddToCart ui = new UI_AddToCart();
         ui.drawBackground();
     }
 
-    public void drawBackground() throws IOException {
-        String skoFrånDb;
+    public void drawBackground() throws IOException, SQLException, ClassNotFoundException {
         JFrame f1 = new JFrame("Skobutik");
         JPanel p1 = new JPanel();
         JPanel p2 = new JPanel();
@@ -28,7 +28,7 @@ public class UI_AddToCart {
         JLabel l1 = new JLabel(test);
         JTextField jtp1 = new JTextField("Text");
 
-        JButton jb1 = new JButton("Sko1");
+        JButton jb1 = new JButton(R1.getSkomodellFromDatabase(1));
         jb1.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -36,11 +36,11 @@ public class UI_AddToCart {
                 ImageIcon update = new ImageIcon("C:\\Users\\apa3\\Pictures\\MEmu Photo\\1NUzZXw.jpeg");
                 l1.setIcon(update);
                 f1.setVisible(true);
-                jtp1.setText();
+//                jtp1.setText();
             }
         });
 
-        JButton jb2 = new JButton("Sko2");
+        JButton jb2 = new JButton(R1.getSkomodellFromDatabase(2));
         jb2.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -50,7 +50,7 @@ public class UI_AddToCart {
                 f1.setVisible(true);
             }
         });
-        JButton jb3 = new JButton("Sko3");
+        JButton jb3 = new JButton(R1.getSkomodellFromDatabase(3));
         jb3.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -60,7 +60,7 @@ public class UI_AddToCart {
                 f1.setVisible(true);
             }
         });
-        JButton jb4 = new JButton("Sko4");
+        JButton jb4 = new JButton(R1.getSkomodellFromDatabase(4));
         jb4.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
