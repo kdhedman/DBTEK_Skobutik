@@ -1,3 +1,5 @@
+import com.mysql.cj.protocol.Resultset;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
@@ -13,7 +15,7 @@ public class Repository {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         Repository repo = new Repository();
-        repo.testingDBConnection();
+        repo.showInventory("select * from skomodell");
     }
 
     private void testingDBConnection() throws ClassNotFoundException, IOException {
@@ -27,9 +29,48 @@ public class Repository {
            ResultSet rs = stmt.executeQuery("SELECT namn from kund");
            while(rs.next()){
                System.out.println(rs.getString("namn"));
+
            }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
     }
+
+    private void showInventory (String query) throws IOException, ClassNotFoundException {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        try(Connection con = DriverManager.getConnection(
+                p.getProperty("connection"),
+                p.getProperty("user"),
+                p.getProperty("pw")))
+        {
+            Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            ResultSet rs = stmt.executeQuery(query);
+            while(rs.next()){
+                System.out.print(rs.getString("skomodell"));
+                System.out.print(" Lagerstatus: ");
+                System.out.println(rs.getInt("lagerstatus"));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+    }
+    private ResultSet getData(String query) throws ClassNotFoundException, SQLException {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        try(Connection con = DriverManager.getConnection(
+                p.getProperty("connection"),
+                p.getProperty("user"),
+                p.getProperty("pw")))
+        {
+            Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+           return stmt.executeQuery(query);
+
+        }
+
+}
+private String getSkomodellFromDatabase(int skomodellId) throws SQLException, ClassNotFoundException {
+        ResultSet rs = getData("Select from skomodell where id = ?");
+        rs.next();
+       return rs.getString("skomodell");
+}
 }
