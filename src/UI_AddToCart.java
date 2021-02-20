@@ -36,7 +36,13 @@ public class UI_AddToCart {
                 ImageIcon update = new ImageIcon("C:\\Users\\apa3\\Pictures\\MEmu Photo\\1NUzZXw.jpeg");
                 l1.setIcon(update);
                 f1.setVisible(true);
-//                jtp1.setText();
+                try {
+                    jtp1.setText(R1.getPrisFromDatabase(1));
+                } catch (ClassNotFoundException classNotFoundException) {
+                    classNotFoundException.printStackTrace();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             }
         });
 
@@ -48,6 +54,13 @@ public class UI_AddToCart {
                 ImageIcon update = new ImageIcon("C:\\Users\\apa3\\Pictures\\MEmu Photo\\4m2bojA.jpg");
                 l1.setIcon(update);
                 f1.setVisible(true);
+                try {
+                    jtp1.setText(R1.getPrisFromDatabase(2));
+                } catch (ClassNotFoundException classNotFoundException) {
+                    classNotFoundException.printStackTrace();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             }
         });
         JButton jb3 = new JButton(R1.getSkomodellFromDatabase(3));

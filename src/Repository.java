@@ -71,6 +71,23 @@ public class Repository {
         }
 
 }
+
+    String getPrisFromDatabase(int index) throws ClassNotFoundException, SQLException {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        try(Connection con = DriverManager.getConnection(
+                p.getProperty("connection"),
+                p.getProperty("user"),
+                p.getProperty("pw")))
+        {
+            Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+
+            ResultSet rs = stmt.executeQuery("Select * from skomodell where id = "+index);
+            rs.next();
+            return rs.getString("Pris");
+
+        }
+
+    }
 //private String getSkomodellFromDatabase(int skomodellId) throws SQLException, ClassNotFoundException {
 //        ResultSet rs = getData("Select skomodell from skomodell where id = ",skomodellId);
 //       rs.next();
