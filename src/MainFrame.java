@@ -1,20 +1,31 @@
+import com.sun.tools.javac.Main;
+
 import javax.swing.*;
 
-/**
- * Created by David Hedman <br>
- * Date: 2021-02-22 <br>
- * Time: 12:25 <br>
- * Project: DBTEK_Skobutik <br>
- * Copyright: Nackademin <br>
- */
 public class MainFrame extends JFrame {
-    public MainFrame(){
+    private static MainFrame instance;
+
+    private MainFrame(){
         setTitle("Skobutik");
-        setSize(800, 600);
+        setSize(500, 500);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         LoginPanel login = new LoginPanel();
         add(login);
         setVisible(true);
+    }
+
+    public static MainFrame getInstance(){
+        if(instance == null) {
+            instance = new MainFrame();
+        }
+        return instance;
+    }
+
+    public void changeView(JPanel panel){
+        getContentPane().removeAll();
+        getContentPane().validate();
+        getContentPane().add(panel);
+        validate();
     }
 }

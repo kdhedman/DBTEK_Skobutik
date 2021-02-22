@@ -117,8 +117,12 @@ public class Repository {
 
     }
 
-    String getLagerstatusFromDatabase(int index) throws ClassNotFoundException, SQLException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
+    String getLagerstatusFromDatabase(int index)  {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         try(Connection con = DriverManager.getConnection(
                 p.getProperty("connection"),
                 p.getProperty("user"),
@@ -130,6 +134,8 @@ public class Repository {
             rs.next();
             return rs.getString("lagerstatus");
 
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
         return null;
     }
@@ -182,8 +188,12 @@ public class Repository {
         return null;
     }
 
-    ArrayList getskomodellFromDatabase() throws ClassNotFoundException, SQLException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
+    ArrayList getskomodellFromDatabase() {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         try(Connection con = DriverManager.getConnection(
                 p.getProperty("connection"),
                 p.getProperty("user"),
@@ -196,6 +206,8 @@ public class Repository {
                 temp.add(rs.getString("id"));
             }
             return temp;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
         return null;
     }

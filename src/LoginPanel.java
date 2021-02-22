@@ -1,14 +1,13 @@
+import com.sun.tools.javac.Main;
+import dbObjects.Kund;
+
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
-/**
- * Created by David Hedman <br>
- * Date: 2021-02-22 <br>
- * Time: 12:57 <br>
- * Project: DBTEK_Skobutik <br>
- * Copyright: Nackademin <br>
- */
 public class LoginPanel extends JPanel  {
     private Repository db_rep = new Repository();
 
@@ -26,6 +25,7 @@ public class LoginPanel extends JPanel  {
         setLocationAndSize();
         addContent();
         setActionListeners();
+        errorMessage.setForeground(Color.RED);
 
         userLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         passwordLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -39,7 +39,7 @@ public class LoginPanel extends JPanel  {
         passwordField.setBounds(180,150,220,30);
         showPassword.setBounds(180,180,120,30);
         login.setBounds(300,180,100,30);
-        errorMessage.setBounds(180,90,100,30);
+        errorMessage.setBounds(180,90,300,30);
     }
 
     private void addContent(){
@@ -49,20 +49,21 @@ public class LoginPanel extends JPanel  {
         add(passwordField);
         add(showPassword);
         add(login);
+        add(errorMessage);
     }
 
     public void setActionListeners(){
-        showPassword.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        showPassword.addActionListener(e->{
             passwordField.setEchoChar((showPassword.isSelected() ? ((char) 0) : '*'));
-            }
         });
-        login.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                tryLogin();
-            }
+        login.addActionListener(e -> {
+            tryLogin();
+        });
+        usernameField.addKeyListener((KeyPressedListener) e -> {
+            errorMessage.setText("");
+        });
+        passwordField.addKeyListener((KeyPressedListener) e -> {
+            errorMessage.setText("");
         });
     }
 
@@ -70,8 +71,17 @@ public class LoginPanel extends JPanel  {
         System.out.println("Loginförsök");
         String username = usernameField.getText();
         String password = String.valueOf(passwordField.getPassword());
-        System.out.println(username + " " + password);
-        System.out.println(db_rep.tryLogin(username, password) ? "Success!" : "Fail");
-
+        System.out.printf("User: %s, Password: %s\n", username, password);
+        boolean success = db_rep.tryLogin(username, password);
+        System.out.println(success ? "Success!" : "Fail");
+        if(success){
+            MainFrame mf = MainFrame.getInstance();
+            UI_AddToCart store = new UI_AddToCart();
+            mf.changeView(store.p1);
+            Kund.setNamn(username);
+        } else {
+            errorMessage.setText("Nähä, du! Där gick det fel!");
+            errorMessage.validate();
+        }
     }
 }
