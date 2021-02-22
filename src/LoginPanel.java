@@ -1,12 +1,7 @@
-import com.sun.tools.javac.Main;
 import dbObjects.Kund;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 public class LoginPanel extends JPanel  {
     private Repository db_rep = new Repository();
@@ -78,7 +73,8 @@ public class LoginPanel extends JPanel  {
             MainFrame mf = MainFrame.getInstance();
             UI_AddToCart store = new UI_AddToCart();
             mf.changeView(store.p1);
-            Kund.setNamn(username);
+            Kund kund = new Kund(username);
+            ActiveKund.setKund(kund);
         } else {
             errorMessage.setText("Nähä, du! Där gick det fel!");
             errorMessage.validate();

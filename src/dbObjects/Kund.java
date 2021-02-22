@@ -8,13 +8,19 @@ package dbObjects;
  * Copyright: Nackademin <br>
  */
 public class Kund {
-    private static String namn;
+    private String namn;
+    private String adress;
+    private Ort ort;
 
-    public static String getNamn() {
+    public Kund(String namn){
+
+    }
+
+    public String getNamn() {
         return namn;
     }
 
-    public static void setNamn(String name){
+    public void setNamn(String name){
         if(name == null || name.isBlank()){
             throw new NullPointerException("Namn can not be empty");
         }
