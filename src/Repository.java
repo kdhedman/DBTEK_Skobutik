@@ -153,7 +153,7 @@ public class Repository {
         {
             ArrayList temp = new ArrayList();
             Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-            ResultSet rs = stmt.executeQuery("select * from lagermappning join storlek on storlek.id = lagermappning.storlekID where lagermappning.skomodellid ="+index);
+            ResultSet rs = stmt.executeQuery("select distinct skostorlek  from lagermappning join storlek on storlek.id = lagermappning.storlekID where lagermappning.skomodellid ="+index);
             while (rs.next()) {
                 temp.add(rs.getString("skostorlek"));
             }

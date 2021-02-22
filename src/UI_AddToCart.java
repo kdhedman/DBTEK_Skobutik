@@ -31,9 +31,9 @@ public class UI_AddToCart {
         jComboBoxStorlekar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                jComboBoxColor.removeAllItems();
                 try {
-                    jComboBoxColor.removeAllItems();
+
                     ArrayList temp = R1.getfärgFromDatabase(id1[0],Integer.parseInt((String )jComboBoxStorlekar.getSelectedItem()));
                     for (int i = 0; i < temp.size(); i++) {
                         jComboBoxColor.addItem(temp.get(i));
