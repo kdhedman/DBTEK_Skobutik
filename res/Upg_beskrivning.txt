@@ -1,0 +1,10 @@
+Du driver en webbshop som säljer skor på nätet och nu är det dags att bygga ut lösningen
+för att klara kommande anstormningar av beställningar.
+Använd din databas som skrevs under inlämningsuppgift 1 och bygg vidare på den nu i uppgift 2.
+
+Läs hela uppgiften noga innan du börjar koda.
+Det kan vara så att du blir tvungen att ändra och modifiera i designen/datat i databasen för att lösa uppgifterna,
+eller att kod från G-delen måste modifieras för att nå VG-nivå, detta ingår i så fall i uppgiften.
+Denna inlämningsuppgift har en SQL-del och en Java-del.
+Notera att för var och en av dessa delar finns en G-del och en VG-del.
+Bägge delarna måste vara gjorda på VG-nivå för att du ska få VG i betyg på hela uppgiften.
