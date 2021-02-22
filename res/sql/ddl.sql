@@ -249,3 +249,22 @@ insert into betyg
     create index storleksmappning_skomodellid_index on storleksmappning (skomodellid);
     create index färgmappning_skomodellid_index on färgmappning (skomodellid);
    -- Vi har val dessa två eftersom de kommer växa sig väldigt stora iom att det blir fler skomodeller.
+
+create table slutilager(
+    id int not null auto_increment,
+    skomodellID int not null,
+    datum timestamp default current_timestamp,
+    primary key(id),
+    foreign key(skomodellID) references skomodell(id)
+);
+
+delimiter //
+create trigger after_skomodell_update
+    after update on skomodell
+    for each row
+begin
+    if new.lagerstatus < 1 then
+        insert into slutilager(skomodellID) VALUES (new.id);
+    end if;
+end//
+delimiter ;
