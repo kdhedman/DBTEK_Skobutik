@@ -2,6 +2,7 @@ import dbObjects.Kund;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 public class LoginPanel extends JPanel  {
     private Repository db_rep = new Repository();
@@ -59,7 +60,9 @@ public class LoginPanel extends JPanel  {
         });
         passwordField.addKeyListener((KeyPressedListener) e -> {
             errorMessage.setText("");
-            //Enter = trylogin.
+            if(e.getKeyCode() == KeyEvent.VK_ENTER){
+                tryLogin();
+            }
         });
     }
 
