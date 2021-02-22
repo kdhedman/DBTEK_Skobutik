@@ -30,6 +30,17 @@ public class UI_AddToCart {
 
         addActionListeners();
 
+        jComboBoxStorlekar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jComboBoxColor.removeAllItems();
+                ArrayList temp = R1.getfärgFromDatabase(id1[0],Integer.parseInt((String )jComboBoxStorlekar.getSelectedItem()));
+                for (int i = 0; i < temp.size(); i++) {
+                    jComboBoxColor.addItem(temp.get(i));
+                }
+            }
+        });
+
         for (int i = 1; i <= skor.size(); i++) {
             JButton jb = new JButton(R1.getSkomodellFromDatabase(i));
             int finalIndex = i;
@@ -49,11 +60,23 @@ public class UI_AddToCart {
                         jComboBoxStorlekar.addItem(temp.get(i));
                     }
                     jComboBoxColor.removeAllItems();
-                    ArrayList temp2 = R1.getfärgFromDatabase(finalIndex);
+                    ArrayList temp2 = R1.getfärgFromDatabase(finalIndex, Integer.parseInt((String )jComboBoxStorlekar.getSelectedItem()));
                     for (int i = 0; i < temp2.size(); i++) {
                         jComboBoxColor.addItem(temp2.get(i));
                     }
-                    jtfLagerStatus.setText("I lager: "+R1.getLagerstatusFromDatabase(finalIndex));
+                    String tempstr = null;
+                    try {
+                        tempstr = (String)jComboBoxColor.getSelectedItem();
+                        System.out.println(tempstr);
+//                                (String)R1.getfärgFromDatabase(id1[0],Integer.parseInt((String )jComboBoxStorlekar.getSelectedItem()));
+                        jtfLagerStatus.setText("I lager: "+R1.getLagerstatusFromDatabase(finalIndex,Integer.parseInt((String)jComboBoxStorlekar.getSelectedItem()),tempstr));
+                        System.out.println(Integer.parseInt((String)jComboBoxStorlekar.getSelectedItem()));
+                    } catch (NumberFormatException numberFormatException) {
+                        numberFormatException.printStackTrace();
+                    } catch (IndexOutOfBoundsException hhh){
+                        jtfLagerStatus.setText("sdfsdf");
+                    }
+
                     id1[0] = finalIndex;
 
                 }
@@ -71,7 +94,7 @@ public class UI_AddToCart {
         buttonAddToCart.addActionListener(e -> {
                 try {
                     R1.addToCart(id1[0],8,Integer.parseInt(jComboBoxStorlekar.getSelectedItem().toString()),(String)jComboBoxColor.getSelectedItem());
-                    jtfLagerStatus.setText("I lager: "+R1.getLagerstatusFromDatabase(id1[0]));
+                    jtfLagerStatus.setText("I lager: "+R1.getLagerstatusFromDatabase(id1[0],Integer.parseInt((String)jComboBoxStorlekar.getSelectedItem()),(String)R1.getfärgFromDatabase(id1[0],Integer.parseInt((String )jComboBoxStorlekar.getSelectedItem())).get(0)));
                 } catch (ClassNotFoundException classNotFoundException) {
                     classNotFoundException.printStackTrace();
                 } catch (IOException ioException) {

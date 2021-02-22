@@ -117,7 +117,7 @@ public class Repository {
 
     }
 
-    String getLagerstatusFromDatabase(int index)  {
+    String getLagerstatusFromDatabase(int index, int storlek, String färg)  {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
@@ -130,7 +130,7 @@ public class Repository {
         {
             Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 
-            ResultSet rs = stmt.executeQuery("Select * from skomodell where id = "+index);
+            ResultSet rs = stmt.executeQuery("Select lagerstatus from lagermappning where skomodellid = "+index+" and storlekid = (select id from storlek where skostorlek= "+storlek+") and färgid = (select färg.id from färg where färg = '"+färg+"')");
             rs.next();
             return rs.getString("lagerstatus");
 
@@ -153,7 +153,7 @@ public class Repository {
         {
             ArrayList temp = new ArrayList();
             Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-            ResultSet rs = stmt.executeQuery("select * from storlek join storleksmappning on storlek.id = storleksmappning.storlekID join skomodell on storleksmappning.skomodellID = skomodell.id where skomodell.id ="+index);
+            ResultSet rs = stmt.executeQuery("select * from lagermappning join storlek on storlek.id = lagermappning.storlekID where lagermappning.skomodellid ="+index);
             while (rs.next()) {
                 temp.add(rs.getString("skostorlek"));
             }
@@ -164,7 +164,7 @@ public class Repository {
         return null;
     }
 
-    ArrayList getfärgFromDatabase(int index) {
+    ArrayList getfärgFromDatabase(int index, int storlek) {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
@@ -177,7 +177,7 @@ public class Repository {
         {
             ArrayList temp = new ArrayList();
             Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-            ResultSet rs = stmt.executeQuery("select * from färg join färgmappning on färg.id = färgmappning.färgID join skomodell on färgmappning.skomodellID = skomodell.id where skomodell.id = "+index);
+            ResultSet rs = stmt.executeQuery("select *  from färg join lagermappning on färg.id = lagermappning.FärgId where SkomodellId ="+index+" and StorlekId =(select id from storlek where  Skostorlek = "+storlek+")");
             while (rs.next()) {
                 temp.add(rs.getString("Färg"));
             }
