@@ -31,10 +31,15 @@ public class UI_AddToCart {
         jComboBoxStorlekar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                jComboBoxColor.removeAllItems();
-                ArrayList temp = R1.getfärgFromDatabase(id1[0],Integer.parseInt((String )jComboBoxStorlekar.getSelectedItem()));
-                for (int i = 0; i < temp.size(); i++) {
-                    jComboBoxColor.addItem(temp.get(i));
+
+                try {
+                    jComboBoxColor.removeAllItems();
+                    ArrayList temp = R1.getfärgFromDatabase(id1[0],Integer.parseInt((String )jComboBoxStorlekar.getSelectedItem()));
+                    for (int i = 0; i < temp.size(); i++) {
+                        jComboBoxColor.addItem(temp.get(i));
+                    }
+                } catch (NumberFormatException numberFormatException) {
+//                    numberFormatException.printStackTrace();
                 }
             }
         });
@@ -66,7 +71,6 @@ public class UI_AddToCart {
                     try {
                         tempstr = (String)jComboBoxColor.getSelectedItem();
                         System.out.println(tempstr);
-//                                (String)R1.getfärgFromDatabase(id1[0],Integer.parseInt((String )jComboBoxStorlekar.getSelectedItem()));
                         jtfLagerStatus.setText("I lager: "+R1.getLagerstatusFromDatabase(finalIndex,Integer.parseInt((String)jComboBoxStorlekar.getSelectedItem()),tempstr));
                         System.out.println(Integer.parseInt((String)jComboBoxStorlekar.getSelectedItem()));
                     } catch (NumberFormatException numberFormatException) {

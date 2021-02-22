@@ -118,80 +118,181 @@ insert into skomodell
 	('Flingor', 455, 1),
 	('Ecco', 799, 6);
 
-create table beställning(
-	id int not null auto_increment,
-	skomodellID int,
-	kvantitet int not null,
-	storlekID int not null,
-	färgid int not null,
-	leveransID int not null,
-	primary key(id),
-	foreign key(skomodellID) references skomodell(id) on delete set null,
-    -- Om en tar bort en skomodell vill vi inte att gamla beställningar försvinner så vi sätter skomodellID till null istället.
-	foreign key(storlekID) references storlek(id),
-	foreign key(färgID) references färg(id),
-	foreign key(leveransID) references leverans(id)
-);
+  create table beställning(
+id int not null auto_increment,
+kvantitet int not null,
+LagermappningsId int not null,
+leveransID int not null,
+primary key(id),
+foreign key(LagermappningsId) references lagermappning(id),
+foreign key(leveransID) references leverans(id)
+  );
 
-insert into beställning
-	(skomodellID, kvantitet, storlekID, färgID, leveransID)
-	VALUES
-	(7, 10, 6, 3, 1),
-	(2, 1, 7, 1, 1),
-	(6, 2, 6, 2 , 2),
-	(8, 1, 7, 4, 3),
-	(9, 100, 13, 5, 4),
-	(1, 2, 7, 1, 5),
-	(10, 1, 9, 2, 6),
-    (10, 2, 9, 2, 7);
+  insert into beställning
+  (kvantitet, lagermappningsid, leveransID)
+  VALUES
+  (10, 6, 1),
+  (1, 7, 1),
+  (2, 6, 2),
+  (1, 7, 3),
+  (100, 13, 4),
+  (2, 7, 5),
+  (11, 9, 6),
+  ( 2, 9, 7);
 
-create table FärgMappning(
-	id int not null auto_increment,
-	skomodellID int not null,
-	färgID int not null,
-	primary key(id),
-	foreign key(skomodellID) references skomodell(id) on delete cascade,
-    -- Här har vi cascade för om en tar bort en skomodell vill vi ta bort alla relaterade färgmappningar
-	foreign key(färgID) references färg(id)
-);
+  create table lagermappning(
+                                id int not null auto_increment primary key,
+                                SkomodellId int not null,
+                                StorlekId int not null,
+                                FärgId int not null,
+                                Lagerstatus int,
+                                foreign key (skomodellid) references skomodell(id),
+                                foreign key (storlekid) references storlek(id),
+                                foreign key (färgid) references färg(id)
 
-insert into FärgMappning
-	(skomodellID, färgID)
-	values
-	(1,1), (1,2), (1,3),
-	(2,4), (2,5), (2,6),
-	(3,7), (3,1), (3,2),
-	(4,3), (4,4), (4,5),
-	(5,6), (5,7), (5,1),
-	(6,2), (6,3), (6,4),
-	(7,5), (7,6), (7,7),
-	(8,1), (8,2), (8,3),
-	(9,4), (9,5), (9,6),
-	(10,7), (10,1), (10,2);
+  );
 
-create table StorleksMappning(
-	id int not null auto_increment,
-	skomodellID int not null,
-	storlekID int not null,
-	primary key(id),
-	foreign key(skomodellID) references skomodell(id) on delete cascade,
-    -- Här har vi cascade för om en tar bort en skomodell vill vi ta bort alla relaterade storleksmappningar
-	foreign key(storlekID) references storlek(id)
-);
+  insert into lagermappning
+  (Skomodellid, storlekid, färgid,lagerstatus)
+  values
+  ((1),(1),(1),(10)),
+  ((1),(1),(2),(10)),
+  ((1),(1),(3),(10)),
+  ((1),(2),(4),(10)),
+  ((1),(2),(5),(10)),
+  ((1),(2),(6),(10)),
+  ((1),(3),(7),(10)),
+  ((1),(3),(1),(10)),
+  ((1),(3),(2),(10)),
+  ((2),(4),(3),(10)),
+  ((2),(4),(4),(10)),
+  ((2),(4),(5),(10)),
+  ((2),(5),(6),(10)),
+  ((2),(5),(7),(10)),
+  ((2),(5),(1),(10)),
+  ((2),(6),(2),(10)),
+  ((2),(6),(3),(10)),
+  ((2),(6),(4),(10)),
+  ((3),(7),(5),(10)),
+  ((3),(7),(6),(10)),
+  ((3),(8),(7),(10)),
+  ((3),(8),(1),(10)),
+  ((3),(8),(2),(10)),
+  ((3),(9),(3),(10)),
+  ((3),(9),(4),(10)),
+  ((3),(9),(5),(10)),
+  ((3),(10),(6),(10)),
+  ((3),(10),(7),(10)),
+  ((4),(10),(1),(10)),
+  ((4),(11),(2),(10)),
+  ((4),(11),(3),(10)),
+  ((4),(11),(4),(10)),
+  ((4),(12),(5),(10)),
+  ((4),(12),(6),(10)),
+  ((4),(12),(7),(10)),
+  ((4),(13),(1),(10)),
+  ((4),(13),(2),(10)),
+  ((5),(13),(3),(10)),
+  ((5),(14),(4),(10)),
+  ((5),(14),(5),(10)),
+  ((5),(14),(6),(10)),
+  ((5),(15),(7),(10)),
+  ((5),(15),(1),(10)),
+  ((5),(15),(2),(10)),
+  ((5),(16),(3),(10)),
+  ((5),(16),(4),(10)),
+  ((6),(16),(5),(10)),
+  ((6),(17),(6),(10)),
+  ((6),(17),(7),(10)),
+  ((6),(17),(1),(10)),
+  ((6),(18),(2),(10)),
+  ((6),(18),(3),(10)),
+  ((6),(18),(4),(10)),
+  ((6),(19),(5),(10)),
+  ((6),(19),(6),(10)),
+  ((7),(19),(7),(10)),
+  ((7),(20),(1),(10)),
+  ((7),(20),(2),(10)),
+  ((7),(20),(3),(10)),
+  ((7),(1),(4),(10)),
+  ((7),(1),(5),(10)),
+  ((7),(1),(6),(10)),
+  ((7),(2),(7),(10)),
+  ((7),(2),(1),(10)),
+  ((8),(2),(2),(10)),
+  ((8),(3),(3),(10)),
+  ((8),(3),(4),(10)),
+  ((8),(3),(5),(10)),
+  ((8),(4),(6),(10)),
+  ((8),(4),(7),(10)),
+  ((8),(4),(1),(10)),
+  ((8),(5),(2),(10)),
+  ((9),(5),(3),(10)),
+  ((9),(5),(4),(10)),
+  ((9),(6),(5),(10)),
+  ((9),(6),(6),(10)),
+  ((9),(6),(7),(10)),
+  ((9),(7),(1),(10)),
+  ((9),(7),(2),(10)),
+  ((9),(7),(3),(10)),
+  ((9),(8),(4),(10)),
+  ((10),(8),(5),(10)),
+  ((10),(8),(6),(10)),
+  ((10),(8),(7),(10)),
+  ((10),(9),(1),(10)),
+  ((10),(9),(2),(10)),
+  ((10),(9),(3),(10)),
+  ((10),(10),(4),(10)),
+  ((10),(10),(5),(10)),
+  ((10),(10),(7),(10));
 
-insert into StorleksMappning
-	(skomodellID, storlekID)
-	VALUES
-	(1,5), (1,6), (1,7),
-	(2,18), (2,19),
-	(3,14), (3,15), (3,16),
-	(4,6), (4,7), (4,8), (4,9),
-	(5,14), (5,15), (5,16),
-	(6,2), (6,6),
-	(7,5), (7,6),
-	(8,9), (8,11), (8,13),
-	(9,12), (9,13), (9,14),
-	(10,7), (10,11), (10,14), (10,16);
+-- create table FärgMappning(
+-- 	id int not null auto_increment,
+-- 	skomodellID int not null,
+-- 	färgID int not null,
+-- 	primary key(id),
+-- 	foreign key(skomodellID) references skomodell(id) on delete cascade,
+--     -- Här har vi cascade för om en tar bort en skomodell vill vi ta bort alla relaterade färgmappningar
+-- 	foreign key(färgID) references färg(id)
+-- );
+--
+-- insert into FärgMappning
+-- 	(skomodellID, färgID)
+-- 	values
+-- 	(1,1), (1,2), (1,3),
+-- 	(2,4), (2,5), (2,6),
+-- 	(3,7), (3,1), (3,2),
+-- 	(4,3), (4,4), (4,5),
+-- 	(5,6), (5,7), (5,1),
+-- 	(6,2), (6,3), (6,4),
+-- 	(7,5), (7,6), (7,7),
+-- 	(8,1), (8,2), (8,3),
+-- 	(9,4), (9,5), (9,6),
+-- 	(10,7), (10,1), (10,2);
+--
+-- create table StorleksMappning(
+-- 	id int not null auto_increment,
+-- 	skomodellID int not null,
+-- 	storlekID int not null,
+-- 	primary key(id),
+-- 	foreign key(skomodellID) references skomodell(id) on delete cascade,
+--     -- Här har vi cascade för om en tar bort en skomodell vill vi ta bort alla relaterade storleksmappningar
+-- 	foreign key(storlekID) references storlek(id)
+-- );
+--
+-- insert into StorleksMappning
+-- 	(skomodellID, storlekID)
+-- 	VALUES
+-- 	(1,5), (1,6), (1,7),
+-- 	(2,18), (2,19),
+-- 	(3,14), (3,15), (3,16),
+-- 	(4,6), (4,7), (4,8), (4,9),
+-- 	(5,14), (5,15), (5,16),
+-- 	(6,2), (6,6),
+-- 	(7,5), (7,6),
+-- 	(8,9), (8,11), (8,13),
+-- 	(9,12), (9,13), (9,14),
+-- 	(10,7), (10,11), (10,14), (10,16);
 
 create table KategoriMappning(
 	id int not null auto_increment,
