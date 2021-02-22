@@ -238,4 +238,19 @@ public class Repository {
         }
         return false;
     }
+
+    void addToCart(int skomodelId, int kundId,int storlek, String färg) throws ClassNotFoundException, IOException {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        try(Connection con = DriverManager.getConnection(
+                p.getProperty("connection"),
+                p.getProperty("user"),
+                p.getProperty("pw")))
+        {
+            Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            stmt.executeQuery("call Stored_Procedure_Add_to_Cart ("+skomodelId+","+kundId+","+storlek+",'"+färg+"')");
+            System.out.println("kallad på!");
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
 }
