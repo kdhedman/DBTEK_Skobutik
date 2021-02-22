@@ -47,25 +47,26 @@ insert into Ort
 	('inhyrarborg'),('King of the hill');
 
 create table kund(
-	id int not null auto_increment primary key,
-	namn varchar(50) not null default 'ortnamn',
-	adress varchar(50) not null,
-	OrtID int default (7) references ort(id) on delete set null
-	-- För att visa att vi KAN ta bort saker trots Foreign keys.
+    id int not null auto_increment primary key,
+    namn varchar(50) not null default 'ortnamn',
+    adress varchar(50) not null,
+    OrtID int default (7) references ort(id) on delete set null,
+    -- För att visa att vi KAN ta bort saker trots Foreign keys.
+    passerord varchar(50) not null default 'passerord'
 );
 
 insert into kund
-	(namn, adress, ortID) VALUES
-	('Askungen', 'Pumpagränd 2', 1),
-	('Elin', 'Elinborhär 2', 2),
-	('Sigrun', 'Nackademin 3', 3),
-	('David', 'Elinborhär 2',2),
-	('Jesper', 'Hemma',4),
-	('Mahmud', 'Nackademin 3', 3),
-	('Lotta', 'Nackademin 2', 3),
-	('Josef', 'Konsultadress 1',5),
-	('Carl-Johan', 'Konsultadress 2',5),
-	('Kungen', 'Slottet', 6);
+    (namn, adress, ortID, passerord) VALUES
+    ('Askungen', 'Pumpagränd 2', 1, 'Askungen1'),
+    ('Elin', 'Elinborhär 2', 2, 'Elin1'),
+    ('Sigrun', 'Nackademin 3', 3, 'Sigrun1'),
+    ('David', 'Elinborhär 2', 2, 'David1'),
+    ('Jesper', 'Hemma', 4, 'Jesper1'),
+    ('Mahmoud', 'Nackademin 3', 3, 'Mahmoud1'),
+    ('Lotta', 'Nackademin 2', 3, 'Lotta1'),
+    ('Josef', 'Konsultadress 1', 5, 'Josef1'),
+    ('Carl-Johan', 'Konsultadress 2', 5, 'Carl-Johan1'),
+    ('Kungen', 'Slottet', 6, 'Kungen1');
 
 create table leverans (
 	id int not null auto_increment primary key,
