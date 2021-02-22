@@ -1,13 +1,7 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
-
 
 public class UI_AddToCart {
     Repository R1 = new Repository();
@@ -42,29 +36,23 @@ public class UI_AddToCart {
                 public void mouseEntered(MouseEvent e) {
                     super.mouseEntered(e);
 
-                    try {
-                        ImageIcon update = null;
-                        String sko1 =R1.getSkomodellFromDatabase(finalIndex);
-                        update = new ImageIcon("res/Pictures/"+ sko1 +".png");
-                        l1.setIcon(update);
-                        jtf1.setText("Pris: "+R1.getPrisFromDatabase(finalIndex));
-                        jcb1.removeAllItems();
-                        ArrayList temp = R1.getStorlekarFromDatabase(finalIndex);
-                        for (int i = 0; i < temp.size(); i++) {
-                            jcb1.addItem(temp.get(i));
-                        }
-                        jcb2.removeAllItems();
-                        ArrayList temp2 = R1.getfärgFromDatabase(finalIndex);
-                        for (int i = 0; i < temp2.size(); i++) {
-                            jcb2.addItem(temp2.get(i));
-                        }
-                        jtf2.setText("I lager: "+R1.getLagerstatusFromDatabase(finalIndex));
-                        id1[0] = finalIndex;
-                    } catch (ClassNotFoundException classNotFoundException) {
-                        classNotFoundException.printStackTrace();
-                    } catch (SQLException throwables) {
-                        throwables.printStackTrace();
+                    ImageIcon update = null;
+                    String sko1 =R1.getSkomodellFromDatabase(finalIndex);
+                    update = new ImageIcon("res/Pictures/"+ sko1 +".png");
+                    l1.setIcon(update);
+                    jtf1.setText("Pris: "+R1.getPrisFromDatabase(finalIndex));
+                    jcb1.removeAllItems();
+                    ArrayList temp = R1.getStorlekarFromDatabase(finalIndex);
+                    for (int i = 0; i < temp.size(); i++) {
+                        jcb1.addItem(temp.get(i));
                     }
+                    jcb2.removeAllItems();
+                    ArrayList temp2 = R1.getfärgFromDatabase(finalIndex);
+                    for (int i = 0; i < temp2.size(); i++) {
+                        jcb2.addItem(temp2.get(i));
+                    }
+                    jtf2.setText("I lager: "+R1.getLagerstatusFromDatabase(finalIndex));
+                    id1[0] = finalIndex;
 
                 }
             });
@@ -77,12 +65,9 @@ public class UI_AddToCart {
         p1.add(jcb1);
         p1.add(jcb2);
         p1.add(jtf2);
+        p1.add(jb1);
 
-        jb1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-
+        jb1.addActionListener(e -> {
                 try {
                     R1.addToCart(id1[0],8,Integer.parseInt(jcb1.getSelectedItem().toString()),(String)jcb2.getSelectedItem());
                     jtf2.setText("I lager: "+R1.getLagerstatusFromDatabase(id1[0]));
@@ -90,12 +75,7 @@ public class UI_AddToCart {
                     classNotFoundException.printStackTrace();
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
                 }
-
-
-            }
         });
 //        f1.setSize(500, 500);
 //        f1.setVisible(true);
