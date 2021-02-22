@@ -1,19 +1,13 @@
 package dbObjects;
 
-/**
- * Created by David Hedman <br>
- * Date: 2021-02-22 <br>
- * Time: 16:19 <br>
- * Project: DBTEK_Skobutik <br>
- * Copyright: Nackademin <br>
- */
+
 public class Kund {
     private String namn;
     private String adress;
     private Ort ort;
 
     public Kund(String namn){
-
+        setNamn(namn);
     }
 
     public String getNamn() {

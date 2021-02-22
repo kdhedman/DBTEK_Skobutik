@@ -28,8 +28,6 @@ public class UI_AddToCart {
         JButton buttonAddToCart = new JButton("Lägg i kundvagn");
         JButton buttonShowCart = new JButton("Visa kundvagn");
 
-        addActionListeners();
-
         for (int i = 1; i <= skor.size(); i++) {
             JButton jb = new JButton(R1.getSkomodellFromDatabase(i));
             int finalIndex = i;
@@ -53,8 +51,13 @@ public class UI_AddToCart {
                     for (int i = 0; i < temp2.size(); i++) {
                         jComboBoxColor.addItem(temp2.get(i));
                     }
-                    jtfLagerStatus.setText("I lager: "+R1.getLagerstatusFromDatabase(finalIndex));
+                    int quantity = Integer.parseInt((String)R1.getLagerstatusFromDatabase(finalIndex));
+                    jtfLagerStatus.setText("I lager: "+ quantity);
                     id1[0] = finalIndex;
+
+                    buttonAddToCart.setEnabled(quantity>0);
+
+
 
                 }
             });
@@ -67,6 +70,7 @@ public class UI_AddToCart {
         p1.add(jComboBoxColor);
         p1.add(jtfLagerStatus);
         p1.add(buttonAddToCart);
+        p1.add(buttonShowCart);
 
         buttonAddToCart.addActionListener(e -> {
                 try {
@@ -79,9 +83,10 @@ public class UI_AddToCart {
                 }
         });
 
-    }
-
-    private void addActionListeners(){
-
+        buttonShowCart.addActionListener(e -> {
+            MainFrame mf = MainFrame.getInstance();
+            Cart cart = new Cart();
+            mf.changeView(cart);
+        });
     }
 }

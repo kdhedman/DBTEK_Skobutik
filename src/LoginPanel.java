@@ -59,6 +59,7 @@ public class LoginPanel extends JPanel  {
         });
         passwordField.addKeyListener((KeyPressedListener) e -> {
             errorMessage.setText("");
+            //Enter = trylogin.
         });
     }
 
@@ -70,11 +71,11 @@ public class LoginPanel extends JPanel  {
         boolean success = db_rep.tryLogin(username, password);
         System.out.println(success ? "Login: Success!" : "Login: Fail");
         if(success){
+            Kund kund = new Kund(username);
+            ActiveKund.setKund(kund);
             MainFrame mf = MainFrame.getInstance();
             UI_AddToCart store = new UI_AddToCart();
             mf.changeView(store.p1);
-            Kund kund = new Kund(username);
-            ActiveKund.setKund(kund);
         } else {
             errorMessage.setText("Nähä, du! Där gick det fel!");
             errorMessage.validate();
