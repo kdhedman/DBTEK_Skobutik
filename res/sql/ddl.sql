@@ -269,30 +269,32 @@ begin
     end if;
 end//
 delimiter ;
-  CREATE PROCEDURE `Stored_Procedure_Add_to_Cart`(Skomodell int, Kund int )
-  BEGIN
-declare variable_temp date default null;
-  select datum into variable_temp from leverans where kundid=kund  order by datum asc limit 1;
-  if variable_temp is not null then
-  select * from färg;
-  insert into leverans  (kundiD)values (kund);
-  insert into beställning (Skomodellid, kvantitet, storlekID, färgID, leveransID) values(skomodell, 1,6, 3, last_insert_id());
-  update skomodell set lagerstatus = (lagerstatus - 1) where skomodell.id=skomodell;
-  end if;
-if variable_temp is null then
-if kund != all(select kundid from leverans) then
-insert into leverans  (kundiD)values (kund);
-  end if;
-  select * from färgmappning;
-  if skomodell = any(select skomodellid from beställning join leverans on leverans.id = beställning.leveransid where kundid=kund)  then
-  select * from kategori;
-  update beställning set kvantitet = (kvantitet+1) where leveransid = (select id from leverans where kundid=kund  order by id asc limit 1) and skomodellid = skomodell;
-  else if skomodell != all (select skomodellid from beställning join leverans on leverans.id=beställning.leveransID where kundid=9) then
-  select * from kund;
-  insert into beställning (Skomodellid, kvantitet, storlekID, färgID, leveransID) values(skomodell, 1,6, 3,(select id from leverans where kundid=kund  order by datum asc limit 1));
-  update skomodell set lagerstatus = (lagerstatus - 1) where skomodell.id=skomodell;
-  end if;
-  end if;
-  end if;
 
-  END
+CREATE PROCEDURE `Stored_Procedure_Add_to_Cart`(Skomodell int, Kund int )
+    BEGIN
+    declare variable_temp date default null;
+    select datum into variable_temp from leverans where kundid=kund  order by datum asc limit 1;
+    if variable_temp is not null then
+        select * from färg;
+        insert into leverans  (kundiD)values (kund);
+        insert into beställning (Skomodellid, kvantitet, storlekID, färgID, leveransID) values(skomodell, 1,6, 3, last_insert_id());
+        update skomodell set lagerstatus = (lagerstatus - 1) where skomodell.id=skomodell;
+    end if;
+    if variable_temp is null then
+        if kund != all(select kundid from leverans) then
+            insert into leverans  (kundiD)values (kund);
+        end if;
+        select * from färgmappning;
+        if skomodell = any(select skomodellid from beställning join leverans on leverans.id = beställning.leveransid where kundid=kund)  then
+            select * from kategori;
+            update beställning set kvantitet = (kvantitet+1) where leveransid = (select id from leverans where kundid=kund  order by id asc limit 1) and skomodellid = skomodell;
+        else if skomodell != all (select skomodellid from beställning join leverans on leverans.id=beställning.leveransID where kundid=9) then
+            select * from kund;
+            insert into beställning (Skomodellid, kvantitet, storlekID, färgID, leveransID) values(skomodell, 1,6, 3,(select id from leverans where kundid=kund  order by datum asc limit 1));
+            update skomodell set lagerstatus = (lagerstatus - 1) where skomodell.id=skomodell;
+        end if;
+    end if;
+    -- Vad händer här?
+    end if;
+
+END
