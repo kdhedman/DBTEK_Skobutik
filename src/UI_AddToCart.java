@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 
 public class UI_AddToCart {
@@ -27,17 +28,31 @@ public class UI_AddToCart {
         ImageIcon test = new ImageIcon("C:\\Users\\apa3\\Pictures\\MEmu Photo\\1NUzZXw.jpeg");
         JLabel l1 = new JLabel(test);
         JTextField jtp1 = new JTextField("Text");
+        JComboBox jcb1 = new JComboBox();
+        JComboBox jcb2 = new JComboBox();
+        String[] trollo = new String[]{"hej"};
+
 
         JButton jb1 = new JButton(R1.getSkomodellFromDatabase(1));
         jb1.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
                 super.mouseEntered(e);
-                ImageIcon update = new ImageIcon("C:\\Users\\apa3\\Pictures\\MEmu Photo\\1NUzZXw.jpeg");
+                ImageIcon update = new ImageIcon("C:\\Users\\apa3\\Desktop\\Skola\\Databashantering\\Pictures\\skaterboi.png");
                 l1.setIcon(update);
-                f1.setVisible(true);
                 try {
                     jtp1.setText(R1.getPrisFromDatabase(1));
+                    jcb1.removeAllItems();
+                    ArrayList temp = R1.getStorlekarFromDatabase(1);
+                    for (int i = 0; i < temp.size(); i++) {
+                        jcb1.addItem(temp.get(i));
+                    }
+                    jcb2.removeAllItems();
+                    ArrayList temp2 = R1.getfärgFromDatabase(1);
+                    for (int i = 0; i < temp2.size(); i++) {
+                        jcb2.addItem(temp2.get(i));
+                    }
+
                 } catch (ClassNotFoundException classNotFoundException) {
                     classNotFoundException.printStackTrace();
                 } catch (SQLException throwables) {
@@ -51,11 +66,21 @@ public class UI_AddToCart {
             @Override
             public void mouseEntered(MouseEvent e) {
                 super.mouseEntered(e);
-                ImageIcon update = new ImageIcon("C:\\Users\\apa3\\Pictures\\MEmu Photo\\4m2bojA.jpg");
+                ImageIcon update = new ImageIcon("C:\\Users\\apa3\\Desktop\\Skola\\Databashantering\\Pictures\\skatergrl.png");
                 l1.setIcon(update);
-                f1.setVisible(true);
                 try {
                     jtp1.setText(R1.getPrisFromDatabase(2));
+                    jcb1.removeAllItems();
+                    ArrayList temp = R1.getStorlekarFromDatabase(2);
+                    for (int i = 0; i < temp.size(); i++) {
+                        jcb1.addItem(temp.get(i));
+                    }
+                    jcb2.removeAllItems();
+                    ArrayList temp2 = R1.getfärgFromDatabase(2);
+                    for (int i = 0; i < temp2.size(); i++) {
+                        jcb2.addItem(temp2.get(i));
+                    }
+
                 } catch (ClassNotFoundException classNotFoundException) {
                     classNotFoundException.printStackTrace();
                 } catch (SQLException throwables) {
@@ -63,14 +88,22 @@ public class UI_AddToCart {
                 }
             }
         });
+
         JButton jb3 = new JButton(R1.getSkomodellFromDatabase(3));
         jb3.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
                 super.mouseEntered(e);
-                ImageIcon update = new ImageIcon("C:\\Users\\apa3\\Pictures\\MEmu Photo\\1fZubUv.jpeg");
+                ImageIcon update = new ImageIcon("C:\\Users\\apa3\\Desktop\\Skola\\Databashantering\\Pictures\\tank.png");
                 l1.setIcon(update);
-                f1.setVisible(true);
+                l1.setIcon(update);
+                try {
+                    jtp1.setText(R1.getPrisFromDatabase(3));
+                } catch (ClassNotFoundException classNotFoundException) {
+                    classNotFoundException.printStackTrace();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             }
         });
         JButton jb4 = new JButton(R1.getSkomodellFromDatabase(4));
@@ -78,9 +111,16 @@ public class UI_AddToCart {
             @Override
             public void mouseEntered(MouseEvent e) {
                 super.mouseEntered(e);
-                ImageIcon update = new ImageIcon("C:\\Users\\apa3\\Pictures\\MEmu Photo\\lc3nsjF.jpg");
+                ImageIcon update = new ImageIcon("C:\\Users\\apa3\\Desktop\\Skola\\Databashantering\\Pictures\\vanlijsko.png");
                 l1.setIcon(update);
-                f1.setVisible(true);
+                l1.setIcon(update);
+                try {
+                    jtp1.setText(R1.getPrisFromDatabase(4));
+                } catch (ClassNotFoundException classNotFoundException) {
+                    classNotFoundException.printStackTrace();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             }
         });
 
@@ -92,6 +132,8 @@ public class UI_AddToCart {
         p1.add(p2);
         p2.add(l1);
         p1.add(jtp1);
+        p1.add(jcb1);
+        p1.add(jcb2);
         f1.setSize(500, 500);
         f1.setVisible(true);
 

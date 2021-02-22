@@ -1,8 +1,8 @@
-import com.mysql.cj.protocol.Resultset;
-
+import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Properties;
 
 public class Repository {
@@ -87,6 +87,40 @@ public class Repository {
 
         }
 
+    }
+
+    ArrayList getStorlekarFromDatabase(int index) throws ClassNotFoundException, SQLException {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        try(Connection con = DriverManager.getConnection(
+                p.getProperty("connection"),
+                p.getProperty("user"),
+                p.getProperty("pw")))
+        {
+            ArrayList temp = new ArrayList();
+            Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            ResultSet rs = stmt.executeQuery("select * from storlek join storleksmappning on storlek.id = storleksmappning.storlekID join skomodell on storleksmappning.skomodellID = skomodell.id where skomodell.id ="+index);
+            while (rs.next()) {
+                temp.add(rs.getString("skostorlek"));
+            }
+            return temp;
+        }
+    }
+
+    ArrayList getfärgFromDatabase(int index) throws ClassNotFoundException, SQLException {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        try(Connection con = DriverManager.getConnection(
+                p.getProperty("connection"),
+                p.getProperty("user"),
+                p.getProperty("pw")))
+        {
+            ArrayList temp = new ArrayList();
+            Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            ResultSet rs = stmt.executeQuery("select * from färg join färgmappning on färg.id = färgmappning.färgID join skomodell on färgmappning.skomodellID = skomodell.id where skomodell.id = "+index);
+            while (rs.next()) {
+                temp.add(rs.getString("Färg"));
+            }
+            return temp;
+        }
     }
 //private String getSkomodellFromDatabase(int skomodellId) throws SQLException, ClassNotFoundException {
 //        ResultSet rs = getData("Select skomodell from skomodell where id = ",skomodellId);
