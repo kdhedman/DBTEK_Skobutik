@@ -9,7 +9,7 @@ import java.awt.event.ActionListener;
  * Project: DBTEK_Skobutik <br>
  * Copyright: Nackademin <br>
  */
-public class LoginPanel extends JPanel implements ActionListener {
+public class LoginPanel extends JPanel  {
     private Repository db_rep = new Repository();
 
     //Content
@@ -25,11 +25,11 @@ public class LoginPanel extends JPanel implements ActionListener {
         setLayout(null);
         setLocationAndSize();
         addContent();
+        setActionListeners();
 
         userLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         passwordLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        showPassword.addActionListener(this);
-        login.addActionListener(this);
+
     }
 
     private void setLocationAndSize(){
@@ -51,14 +51,19 @@ public class LoginPanel extends JPanel implements ActionListener {
         add(login);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == showPassword){
-            passwordField.setEchoChar(showPassword.isSelected() ? ((char) 0) : '*');
-        }
-        if(e.getSource() == login){
-            tryLogin();
-        }
+    public void setActionListeners(){
+        showPassword.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            passwordField.setEchoChar((showPassword.isSelected() ? ((char) 0) : '*'));
+            }
+        });
+        login.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tryLogin();
+            }
+        });
     }
 
     private void tryLogin(){
