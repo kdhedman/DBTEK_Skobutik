@@ -20,21 +20,21 @@ public class UI_AddToCart {
     }
 
     public void drawBackground() throws IOException, SQLException, ClassNotFoundException {
+        final int[] id1 = new int[1];
         JFrame f1 = new JFrame("Skobutik");
         JPanel p1 = new JPanel();
         JPanel p2 = new JPanel();
-        ImageIcon test = new ImageIcon("C:\\Users\\apa3\\Pictures\\MEmu Photo\\1NUzZXw.jpeg");
+        ImageIcon test = new ImageIcon("res/Pictures/skaterboi.png");
         JLabel l1 = new JLabel(test);
         JTextField jtf1 = new JTextField("Text");
         JTextField jtf2 = new JTextField("I lager: ");
         ArrayList<String> skor = R1.getskomodellFromDatabase();
         JComboBox jcb1 = new JComboBox();
         JComboBox jcb2 = new JComboBox();
-        String[] trollo = new String[]{"hej"};
-        int index =1;
+        JButton jb1 = new JButton("Add to cart!!!!!!!!!!");
         for (int i = 1; i <= skor.size(); i++) {
-            JButton jb = new JButton(R1.getSkomodellFromDatabase(index));
-            int finalIndex = index;
+            JButton jb = new JButton(R1.getSkomodellFromDatabase(i));
+            int finalIndex = i;
             jb.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseEntered(MouseEvent e) {
@@ -42,7 +42,8 @@ public class UI_AddToCart {
 
                     try {
                         ImageIcon update = null;
-                        update = new ImageIcon("C:\\Users\\apa3\\Desktop\\Skola\\Databashantering\\Pictures\\"+R1.getSkomodellFromDatabase(finalIndex)+".png");
+                        String sko1 =R1.getSkomodellFromDatabase(finalIndex);
+                        update = new ImageIcon("res/Pictures/"+ sko1 +".png");
                         l1.setIcon(update);
                         jtf1.setText("Pris: "+R1.getPrisFromDatabase(finalIndex));
                         jcb1.removeAllItems();
@@ -56,16 +57,16 @@ public class UI_AddToCart {
                             jcb2.addItem(temp2.get(i));
                         }
                         jtf2.setText("I lager: "+R1.getLagerstatusFromDatabase(finalIndex));
-
+                        id1[0] = finalIndex;
                     } catch (ClassNotFoundException classNotFoundException) {
                         classNotFoundException.printStackTrace();
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
                     }
+
                 }
             });
             p1.add(jb);
-            index++;
         }
         f1.add(p1);
         p1.add(p2);
@@ -74,6 +75,27 @@ public class UI_AddToCart {
         p1.add(jcb1);
         p1.add(jcb2);
         p1.add(jtf2);
+        p1.add(jb1);
+        jb1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+
+                try {
+                    R1.addToCart(id1[0],8,Integer.parseInt(jcb1.getSelectedItem().toString()),(String)jcb2.getSelectedItem());
+                    jtf2.setText("I lager: "+R1.getLagerstatusFromDatabase(id1[0]));
+                } catch (ClassNotFoundException classNotFoundException) {
+                    classNotFoundException.printStackTrace();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+
+
+            }
+        });
+
         f1.setSize(500, 500);
         f1.setVisible(true);
 
