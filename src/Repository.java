@@ -225,8 +225,9 @@ public class Repository {
         {
             String dbUsername = "";
             String dbPassword = "";
-            Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-            ResultSet rs = stmt.executeQuery("select namn as name, passerord as password from kund where namn like '"+username+"';");
+            PreparedStatement stmt = con.prepareStatement("select namn as name, passerord as password from kund where namn like ?;");
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 dbUsername = rs.getString("name");
                 dbPassword = rs.getString("password");
@@ -252,5 +253,9 @@ public class Repository {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
+    }
+
+    void getKundsBeställningar(){
+
     }
 }

@@ -2,6 +2,7 @@ import dbObjects.Kund;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 public class LoginPanel extends JPanel  {
     private Repository db_rep = new Repository();
@@ -59,6 +60,9 @@ public class LoginPanel extends JPanel  {
         });
         passwordField.addKeyListener((KeyPressedListener) e -> {
             errorMessage.setText("");
+            if(e.getKeyCode() == KeyEvent.VK_ENTER){
+                tryLogin();
+            }
         });
     }
 
@@ -70,11 +74,11 @@ public class LoginPanel extends JPanel  {
         boolean success = db_rep.tryLogin(username, password);
         System.out.println(success ? "Login: Success!" : "Login: Fail");
         if(success){
+            Kund kund = new Kund(username);
+            ActiveKund.setKund(kund);
             MainFrame mf = MainFrame.getInstance();
             UI_AddToCart store = new UI_AddToCart();
             mf.changeView(store.p1);
-            Kund kund = new Kund(username);
-            ActiveKund.setKund(kund);
         } else {
             errorMessage.setText("Nähä, du! Där gick det fel!");
             errorMessage.validate();

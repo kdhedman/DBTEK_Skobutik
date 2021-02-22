@@ -90,6 +90,7 @@ public class UI_AddToCart {
         p1.add(jComboBoxColor);
         p1.add(jtfLagerStatus);
         p1.add(buttonAddToCart);
+        p1.add(buttonShowCart);
 
         buttonAddToCart.addActionListener(e -> {
                 try {
@@ -102,9 +103,10 @@ public class UI_AddToCart {
                 }
         });
 
-    }
-
-    private void addActionListeners(){
-
+        buttonShowCart.addActionListener(e -> {
+            MainFrame mf = MainFrame.getInstance();
+            Cart cart = new Cart();
+            mf.changeView(cart);
+        });
     }
 }
