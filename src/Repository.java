@@ -1,5 +1,5 @@
-import java.awt.*;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -9,17 +9,27 @@ public class Repository {
 
     private Properties p = new Properties();
 
-    public Repository() throws IOException {
-        p.load(new FileInputStream("res/dbc.properties"));
+    public Repository() {
+        try{
+            p.load(new FileInputStream("res/dbc.properties"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException, SQLException {
+    public static void main(String[] args) {
         Repository repo = new Repository();
         System.out.println(repo.getSkomodellFromDatabase(1));
     }
 
-    private void testingDBConnection() throws ClassNotFoundException, IOException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
+    private void testingDBConnection() {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         try(Connection con = DriverManager.getConnection(
                 p.getProperty("connection"),
                 p.getProperty("user"),
@@ -36,8 +46,12 @@ public class Repository {
         }
     }
 
-    private void showInventory (String query) throws IOException, ClassNotFoundException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
+    private void showInventory (String query)  {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         try(Connection con = DriverManager.getConnection(
                 p.getProperty("connection"),
                 p.getProperty("user"),
@@ -55,9 +69,13 @@ public class Repository {
         }
 
     }
-     String getSkomodellFromDatabase(int index) throws ClassNotFoundException, SQLException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        try(Connection con = DriverManager.getConnection(
+     String getSkomodellFromDatabase(int index) {
+         try {
+             Class.forName("com.mysql.cj.jdbc.Driver");
+         } catch (ClassNotFoundException e) {
+             e.printStackTrace();
+         }
+         try(Connection con = DriverManager.getConnection(
                 p.getProperty("connection"),
                 p.getProperty("user"),
                 p.getProperty("pw")))
@@ -68,12 +86,19 @@ public class Repository {
              rs.next();
              return rs.getString("skomodell");
 
+        } catch (SQLException throwables) {
+             throwables.printStackTrace();
+         }
+
+         return null;
+     }
+
+    String getPrisFromDatabase(int index) {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-
-}
-
-    String getPrisFromDatabase(int index) throws ClassNotFoundException, SQLException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
         try(Connection con = DriverManager.getConnection(
                 p.getProperty("connection"),
                 p.getProperty("user"),
@@ -85,12 +110,19 @@ public class Repository {
             rs.next();
             return rs.getString("Pris");
 
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
+        return null;
 
     }
 
-    ArrayList getStorlekarFromDatabase(int index) throws ClassNotFoundException, SQLException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
+    ArrayList getStorlekarFromDatabase(int index) {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         try(Connection con = DriverManager.getConnection(
                 p.getProperty("connection"),
                 p.getProperty("user"),
@@ -103,11 +135,18 @@ public class Repository {
                 temp.add(rs.getString("skostorlek"));
             }
             return temp;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
+        return null;
     }
 
-    ArrayList getfärgFromDatabase(int index) throws ClassNotFoundException, SQLException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
+    ArrayList getfärgFromDatabase(int index) {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         try(Connection con = DriverManager.getConnection(
                 p.getProperty("connection"),
                 p.getProperty("user"),
@@ -120,11 +159,36 @@ public class Repository {
                 temp.add(rs.getString("Färg"));
             }
             return temp;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
+        return null;
     }
-//private String getSkomodellFromDatabase(int skomodellId) throws SQLException, ClassNotFoundException {
-//        ResultSet rs = getData("Select skomodell from skomodell where id = ",skomodellId);
-//       rs.next();
-//       return rs.getString("skomodell");
-//}
+
+    boolean tryLogin(String username, String password){
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        try(Connection con = DriverManager.getConnection(
+                p.getProperty("connection"),
+                p.getProperty("user"),
+                p.getProperty("pw")))
+        {
+            String dbUsername = "";
+            String dbPassword = "";
+            Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            ResultSet rs = stmt.executeQuery("select namn as name, passerord as password from kund where namn like '"+username+"';");
+            while (rs.next()) {
+                dbUsername = rs.getString("name");
+                dbPassword = rs.getString("password");
+            }
+            return ((dbUsername.equalsIgnoreCase(username)) && (dbPassword.equalsIgnoreCase(password)));
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return false;
+    }
 }
