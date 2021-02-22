@@ -255,6 +255,8 @@ public class Repository {
         }
     }
 
+
+
     void getKundsBeställningar(){
 
     }

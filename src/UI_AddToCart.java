@@ -28,8 +28,6 @@ public class UI_AddToCart {
         JButton buttonAddToCart = new JButton("Lägg i kundvagn");
         JButton buttonShowCart = new JButton("Visa kundvagn");
 
-        addActionListeners();
-
         jComboBoxStorlekar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
