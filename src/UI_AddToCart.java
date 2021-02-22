@@ -91,14 +91,8 @@ public class UI_AddToCart {
         p1.add(buttonShowCart);
 
         buttonAddToCart.addActionListener(e -> {
-                try {
-                    R1.addToCart(id1[0],8,Integer.parseInt(jComboBoxStorlekar.getSelectedItem().toString()),(String)jComboBoxColor.getSelectedItem());
-                    jtfLagerStatus.setText("I lager: "+R1.getLagerstatusFromDatabase(id1[0],Integer.parseInt((String)jComboBoxStorlekar.getSelectedItem()),(String)R1.getfärgFromDatabase(id1[0],Integer.parseInt((String )jComboBoxStorlekar.getSelectedItem())).get(0)));
-                } catch (ClassNotFoundException classNotFoundException) {
-                    classNotFoundException.printStackTrace();
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
-                }
+            R1.addToCart(id1[0],ActiveKund.getKund().getId(), Integer.parseInt(jComboBoxStorlekar.getSelectedItem().toString()),(String)jComboBoxColor.getSelectedItem());
+            jtfLagerStatus.setText("I lager: "+R1.getLagerstatusFromDatabase(id1[0],Integer.parseInt((String)jComboBoxStorlekar.getSelectedItem()),(String)R1.getfärgFromDatabase(id1[0],Integer.parseInt((String )jComboBoxStorlekar.getSelectedItem())).get(0)));
         });
 
         buttonShowCart.addActionListener(e -> {
