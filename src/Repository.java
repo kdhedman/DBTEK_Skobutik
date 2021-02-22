@@ -88,6 +88,22 @@ public class Repository {
         }
 
     }
+    String getLagerstatusFromDatabase(int index) throws ClassNotFoundException, SQLException {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        try(Connection con = DriverManager.getConnection(
+                p.getProperty("connection"),
+                p.getProperty("user"),
+                p.getProperty("pw")))
+        {
+            Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+
+            ResultSet rs = stmt.executeQuery("Select * from skomodell where id = "+index);
+            rs.next();
+            return rs.getString("lagerstatus");
+
+        }
+
+    }
 
     ArrayList getStorlekarFromDatabase(int index) throws ClassNotFoundException, SQLException {
         Class.forName("com.mysql.cj.jdbc.Driver");
@@ -118,6 +134,22 @@ public class Repository {
             ResultSet rs = stmt.executeQuery("select * from färg join färgmappning on färg.id = färgmappning.färgID join skomodell on färgmappning.skomodellID = skomodell.id where skomodell.id = "+index);
             while (rs.next()) {
                 temp.add(rs.getString("Färg"));
+            }
+            return temp;
+        }
+    }
+    ArrayList getskomodellFromDatabase() throws ClassNotFoundException, SQLException {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        try(Connection con = DriverManager.getConnection(
+                p.getProperty("connection"),
+                p.getProperty("user"),
+                p.getProperty("pw")))
+        {
+            ArrayList temp = new ArrayList();
+            Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            ResultSet rs = stmt.executeQuery("select *  from skomodell");
+            while (rs.next()) {
+                temp.add(rs.getString("id"));
             }
             return temp;
         }
