@@ -270,13 +270,13 @@ begin
 end//
 delimiter ;
 
-  CREATE DEFINER=`skobutik`@`%` PROCEDURE `Stored_Procedure_Add_to_Cart`(Skomodell int, Kund int )
+  CREATE DEFINER=`skobutik`@`%` PROCEDURE `Stored_Procedure_Add_to_Cart`(Skomodell int, Kund int , StorlekIN int, FärgIN varchar(20))
   BEGIN
 declare variable_temp date default null;
   select datum into variable_temp from leverans where kundid=kund  order by datum asc limit 1;
   if variable_temp is not null then
 insert into leverans  (kundiD)values (kund);
-  insert into beställning (Skomodellid, kvantitet, storlekID, färgID, leveransID) values(skomodell, 1,6, 3, last_insert_id());
+  insert into beställning (Skomodellid, kvantitet, storlekID, färgID, leveransID) values(skomodell, 1,(select storlek.id from storlek where Skostorlek= StorlekIN), (select färg.id from färg  where färg= FärgIN), last_insert_id());
   update skomodell set lagerstatus = (lagerstatus - 1) where skomodell.id=skomodell;
   end if;
 if variable_temp is null then
@@ -287,7 +287,7 @@ if skomodell = any(select skomodellid from beställning join leverans on leveran
   update beställning set kvantitet = (kvantitet+1) where leveransid = (select id from leverans where kundid=kund  order by id asc limit 1) and skomodellid = skomodell;
   update skomodell set lagerstatus = (lagerstatus - 1) where skomodell.id=skomodell;
   else if skomodell != all (select skomodellid from beställning join leverans on leverans.id=beställning.leveransID where kundid=kund) then
-insert into beställning (Skomodellid, kvantitet, storlekID, färgID, leveransID) values(skomodell, 1,6, 3,(select id from leverans where kundid=kund  order by datum asc limit 1));
+insert into beställning (Skomodellid, kvantitet, storlekID, färgID, leveransID) values(skomodell, 1,(select storlek.id from storlek where Skostorlek= StorlekIN), (select färg.id from färg  where färg= FärgIN),(select id from leverans where kundid=kund  order by datum asc limit 1));
   update skomodell set lagerstatus = (lagerstatus - 1) where skomodell.id=skomodell;
   end if;
   end if;
