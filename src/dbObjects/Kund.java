@@ -2,12 +2,18 @@ package dbObjects;
 
 
 public class Kund {
+    private int id;
     private String namn;
     private String adress;
     private Ort ort;
 
-    public Kund(String namn){
+    public Kund(String namn, int id){
         setNamn(namn);
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getNamn() {

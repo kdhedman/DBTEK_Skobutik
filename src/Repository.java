@@ -240,8 +240,12 @@ public class Repository {
         return false;
     }
 
-    void addToCart(int skomodelId, int kundId,int storlek, String färg) throws ClassNotFoundException, IOException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
+    void addToCart(int skomodelId, int kundId,int storlek, String färg) {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         try(Connection con = DriverManager.getConnection(
                 p.getProperty("connection"),
                 p.getProperty("user"),
@@ -255,7 +259,28 @@ public class Repository {
         }
     }
 
-
+    public int getKundIDFromNamn(String namn){
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        try(Connection con = DriverManager.getConnection(
+                p.getProperty("connection"),
+                p.getProperty("user"),
+                p.getProperty("pw")))
+        {
+            PreparedStatement stmt = con.prepareStatement("select id from kund where namn = ?");
+            stmt.setString(1,namn);
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                return rs.getInt("id");
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return -1;
+    }
 
     void getKundsBeställningar(){
 
