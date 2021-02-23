@@ -388,7 +388,7 @@ BEGIN
             insert into leverans  (kundiD)values (kund);
         end if;
         if skomodell = any(select skomodellid from beställning join leverans on leverans.id = beställning.leveransid join lagermappning on beställning.lagermappningsId = lagermappning.id where kundid=kund)  then
-            update beställning set kvantitet = (kvantitet+1) where leveransid = (select id from leverans where kundid=kund  order by id asc limit 1) and lagermappningsid = variable_lagermappningsID;
+            update beställning set kvantitet = (kvantitet+1) where leveransid = (select id from leverans where kundid=kund  order by id desc limit 1) and lagermappningsid = variable_lagermappningsID;
             update lagermappning set lagerstatus = (lagerstatus - 1) where storlekID = (select id from storlek where skostorlek = StorlekIN) and färgid = (select färg.id from färg where färg =FärgIN) and skomodellid = Skomodell;
         else if skomodell != all (select skomodellid from beställning join leverans on leverans.id = beställning.leveransid join lagermappning on beställning.lagermappningsId = lagermappning.id where kundid=kund) then
             insert into beställning (kvantitet, lagermappningsid, leveransID) values(1,(select id from Lagermappning where storlekID = (select id from storlek where skostorlek = StorlekIN) and färgid = (select färg.id from färg where färg =FärgIN)and skomodellid = skomodell),(select id from leverans where kundid=kund  order by datum asc limit 1));
