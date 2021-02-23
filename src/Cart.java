@@ -26,7 +26,7 @@ public class Cart extends JPanel {
     private void countTotalPrice(){
         int total = 0;
         for (int i = 0; i < content.length; i++) {
-            total += Integer.parseInt(content[i][4]);
+            total += Integer.parseInt(content[i][0]) * Integer.parseInt(content[i][4]);
         }
         labelTotalCost.setText("Summa: " + total);
     }
