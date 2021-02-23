@@ -22,7 +22,8 @@ public class UI_AddToCart extends JPanel {
     JLabel labelBetyg = new JLabel("Betyg: ");
     JTextField rating = new JTextField("");
     JLabel labelComment = new JLabel(" Kommentar: ");
-    JTextField comment = new JTextField("Kommentar");
+    JLabel labelCommentCounter = new JLabel();
+    JTextField comment = new JTextField("Kommentar (Max 50 tecken)");
     JButton buttonRate = new JButton("Åsikta dig!");
 
 
@@ -86,7 +87,7 @@ public class UI_AddToCart extends JPanel {
         add(buttonShowCart);
         add(labelBetyg);
         rating.setPreferredSize(new Dimension(25,30));
-        rating.setText("1-5");
+        rating.setText("1-4");
         add(rating);
         add(labelComment);
         comment.setPreferredSize(new Dimension(220,30));
@@ -94,7 +95,10 @@ public class UI_AddToCart extends JPanel {
         add(buttonRate);
 
         updateReviewTable();
+        scrollPane.setVerticalScrollBar(new JScrollBar());
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         add(scrollPane);
+        revalidate();
 
         jComboBoxStorlekar.addActionListener(e -> {
             jComboBoxColor.removeAllItems();
@@ -108,7 +112,6 @@ public class UI_AddToCart extends JPanel {
             } catch (NumberFormatException numberFormatException) {
                 //Let's ignore this
             }
-
         });
 
         jComboBoxColor.addActionListener(e-> {
@@ -140,18 +143,25 @@ public class UI_AddToCart extends JPanel {
             try{
                 ratingInt = Integer.parseInt(rating.getText());
             } catch (NumberFormatException nfe){
-                rating.setText("1-5");
+                rating.setText("1-4");
                 return;
             }
             if(ratingInt <= 0 || ratingInt > 4){
-                rating.setText("1-5");
+                rating.setText("1-4");
+                return;
+            }
+
+            if(comment.getText().length() > 50){
+                comment.setText("Kommentar: (max 50 tecken)");
                 return;
             }
             r1.setRating(ratingInt, comment.getText(), kundId, skomodellID);
             updateReviewTable();
-            rating.setText("1-5");
+            rating.setText("1-4");
             comment.setText("Kommentar");
         });
+
+        updateMedelbetyg();
     }
 
     private void updateLagerstatus() throws NumberFormatException{
@@ -161,6 +171,7 @@ public class UI_AddToCart extends JPanel {
         jtfLagerStatus.setText("I lager: " + lagerstatus);
         buttonAddToCart.setEnabled(lagerstatus > 0);
         buttonAddToCart.setText("Lägg i kundvagn!");
+        this.revalidate();
     }
 
     private void updateMedelbetyg(){
