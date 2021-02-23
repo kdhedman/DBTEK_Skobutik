@@ -140,18 +140,20 @@ public class UI_AddToCart extends JPanel {
             try{
                 ratingInt = Integer.parseInt(rating.getText());
             } catch (NumberFormatException nfe){
-                rating.setText("1-5");
+                rating.setText("1-4");
                 return;
             }
             if(ratingInt <= 0 || ratingInt > 4){
-                rating.setText("1-5");
+                rating.setText("1-4");
                 return;
             }
             r1.setRating(ratingInt, comment.getText(), kundId, skomodellID);
             updateReviewTable();
-            rating.setText("1-5");
+            rating.setText("1-4");
             comment.setText("Kommentar");
         });
+
+        updateMedelbetyg();
     }
 
     private void updateLagerstatus() throws NumberFormatException{
