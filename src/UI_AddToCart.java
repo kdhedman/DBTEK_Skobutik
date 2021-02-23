@@ -10,6 +10,8 @@ public class UI_AddToCart extends JPanel {
     JLabel labelProductImage = new JLabel(imageIcon);
     JTextField jtfPris = new JTextField("Text");
     JTextField jtfLagerStatus = new JTextField("I lager: ");
+    JTextField jtfMedelbetyg = new JTextField("Medelbetyg: ");
+
     JComboBox jComboBoxStorlekar = new JComboBox();
     JComboBox jComboBoxColor = new JComboBox();
     JButton buttonAddToCart = new JButton("Lägg i kundvagn");
@@ -62,6 +64,7 @@ public class UI_AddToCart extends JPanel {
                         jComboBoxColor.addItem(temp2.get(i));
                     }
                     updateLagerstatus();
+                    updateMedelbetyg();
                     updateReviewTable();
 
                     id1[0] = finalIndex;
@@ -76,6 +79,7 @@ public class UI_AddToCart extends JPanel {
         add(jComboBoxStorlekar);
         add(jComboBoxColor);
         add(jtfLagerStatus);
+        add(jtfMedelbetyg);
         buttonAddToCart.setPreferredSize(new Dimension(235,30));
         add(buttonAddToCart);
         buttonShowCart.setPreferredSize(new Dimension(235,30));
@@ -157,6 +161,13 @@ public class UI_AddToCart extends JPanel {
         jtfLagerStatus.setText("I lager: " + lagerstatus);
         buttonAddToCart.setEnabled(lagerstatus > 0);
         buttonAddToCart.setText("Lägg i kundvagn!");
+    }
+
+    private void updateMedelbetyg(){
+        int skoId = r1.getSkomodellIDbyModell(activeButton.getText());
+        int medelbetyg  = r1.getSkomodellAverageBetyg(skoId);
+        jtfMedelbetyg.setText("Medelbetyg: "+medelbetyg);
+        if (medelbetyg == 0) jtfMedelbetyg.setText("Ej betygsatt.");
     }
 
 

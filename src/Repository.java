@@ -401,4 +401,27 @@ public class Repository {
 
         return true;
     }
+
+    public int getSkomodellAverageBetyg(int modelID){
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        try(Connection con = DriverManager.getConnection(
+                p.getProperty("connection"),
+                p.getProperty("user"),
+                p.getProperty("pw")))
+        {
+            PreparedStatement stmt = con.prepareStatement("select get_medelbetyg(?) as Medelbetyg");
+            stmt.setInt(1,modelID);
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                return rs.getInt("Medelbetyg");
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return -1;
+    }
 }
