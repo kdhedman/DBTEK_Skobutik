@@ -86,7 +86,7 @@ public class UI_AddToCart extends JPanel {
         add(buttonShowCart);
         add(labelBetyg);
         rating.setPreferredSize(new Dimension(25,30));
-        rating.setText("1-5");
+        rating.setText("1-4");
         add(rating);
         add(labelComment);
         comment.setPreferredSize(new Dimension(220,30));
