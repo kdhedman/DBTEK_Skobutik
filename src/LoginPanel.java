@@ -78,7 +78,7 @@ public class LoginPanel extends JPanel  {
             ActiveKund.setKund(kund);
             MainFrame mf = MainFrame.getInstance();
             UI_AddToCart store = new UI_AddToCart();
-            mf.changeView(store.p1);
+            mf.changeView(store);
         } else {
             errorMessage.setText("Nähä, du! Där gick det fel!");
             errorMessage.validate();

@@ -3,6 +3,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 public class Repository {
@@ -282,7 +284,44 @@ public class Repository {
         return -1;
     }
 
-    void getKundsBeställningar(){
-
+    public String[][] getKundsBeställningar(String namn){
+        List<String> result = new ArrayList<>();
+        String[][] content;
+        try(Connection con = DriverManager.getConnection(
+                p.getProperty("connection"),
+                p.getProperty("user"),
+                p.getProperty("pw")))
+        {
+            PreparedStatement stmt = con.prepareStatement("select Kvantitet, skomodell, färg, skostorlek, pris from beställning" +
+                    "    join leverans on leveransID = leverans.id" +
+                    "    join kund on kundID = kund.id" +
+                    "    join lagermappning on lagermappningsid = lagermappning.id" +
+                    "    join skomodell on skomodellID = skomodell.id" +
+                    "    join färg on färgid = färg.id" +
+                    "    join storlek on storlekid = storlek.id" +
+                    "    where kund.namn = ? and Datum is null;");
+            stmt.setString(1,namn);
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                StringBuilder sb = new StringBuilder();
+                sb.append(rs.getString("kvantitet") + "#");
+                sb.append(rs.getString("skomodell") +"#");
+                sb.append(rs.getString("färg") +"#");
+                sb.append(rs.getString("skostorlek") +"#");
+                sb.append(rs.getString("pris"));
+                result.add(sb.toString());
+            }
+            content = new String[result.size()][5];
+            for (int i = 0; i < result.size(); i++) {
+                System.out.println("sbResult " + result.get(i).toString());
+                String[] temp = result.get(i).split("#");
+                System.out.println("temp[] " + Arrays.toString(temp));
+                content[i] = temp;
+            }
+            return content;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
     }
 }
