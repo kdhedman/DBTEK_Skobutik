@@ -377,4 +377,28 @@ public class Repository {
         }
         return -1;
     }
+
+    public boolean setRating(int rate, String comment, int kundID, int skomodellID){
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        try(Connection con = DriverManager.getConnection(
+                p.getProperty("connection"),
+                p.getProperty("user"),
+                p.getProperty("pw")))
+        {
+            PreparedStatement stmt = con.prepareStatement("call Stored_Procedure_Rate(?,?,?,?)");
+            stmt.setString(1,""+rate);
+            stmt.setString(2, comment);
+            stmt.setString(3, ""+kundID);
+            stmt.setString(4, ""+skomodellID);
+            stmt.executeQuery();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return true;
+    }
 }

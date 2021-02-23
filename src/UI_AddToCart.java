@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
@@ -15,16 +16,12 @@ public class UI_AddToCart extends JPanel {
     JButton buttonShowCart = new JButton("Visa kundvagn");
     JButton activeButton;
     JScrollPane scrollPane = new JScrollPane();
-    String[][] mockReview1 = {
-            {"Elin", "4", "For the lulz"},
-            {"Jesper", "1", "Nononononono, inte nu, inte någonsin!"},
-            {"Sigrun", "3", "Mja, varför inte?"}
-    };
-    String[][] mockReview2 = {
-            {"Borat", "5", "Very nice, yes!"},
-            {"Ali G", "5", "Boyakasha!"}
-    };
     String[] tableHeader = {"Användare", "Betyg", "Kommentar"};
+    JLabel labelBetyg = new JLabel("Betyg: ");
+    JTextField rating = new JTextField("");
+    JLabel labelComment = new JLabel(" Kommentar: ");
+    JTextField comment = new JTextField("Kommentar");
+    JButton buttonRate = new JButton("Åsikta dig!");
 
 
     public UI_AddToCart() {
@@ -79,8 +76,19 @@ public class UI_AddToCart extends JPanel {
         add(jComboBoxStorlekar);
         add(jComboBoxColor);
         add(jtfLagerStatus);
+        buttonAddToCart.setPreferredSize(new Dimension(235,30));
         add(buttonAddToCart);
+        buttonShowCart.setPreferredSize(new Dimension(235,30));
         add(buttonShowCart);
+        add(labelBetyg);
+        rating.setPreferredSize(new Dimension(25,30));
+        rating.setText("1-5");
+        add(rating);
+        add(labelComment);
+        comment.setPreferredSize(new Dimension(220,30));
+        add(comment);
+        add(buttonRate);
+
         updateReviewTable();
         add(scrollPane);
 
@@ -119,6 +127,27 @@ public class UI_AddToCart extends JPanel {
             Cart cart = new Cart();
             mf.changeView(cart);
         });
+
+        buttonRate.addActionListener(e->{
+            String name = ActiveKund.getKund().getNamn();
+            int kundId = r1.getKundIDFromNamn(name);
+            int skomodellID = r1.getSkomodellIDbyModell(activeButton.getText());
+            int ratingInt = 0;
+            try{
+                ratingInt = Integer.parseInt(rating.getText());
+            } catch (NumberFormatException nfe){
+                rating.setText("1-5");
+                return;
+            }
+            if(ratingInt <= 0 || ratingInt > 4){
+                rating.setText("1-5");
+                return;
+            }
+            r1.setRating(ratingInt, comment.getText(), kundId, skomodellID);
+            updateReviewTable();
+            rating.setText("1-5");
+            comment.setText("Kommentar");
+        });
     }
 
     private void updateLagerstatus() throws NumberFormatException{
@@ -132,18 +161,16 @@ public class UI_AddToCart extends JPanel {
 
 
     private void updateReviewTable() {
-        JTable newTable; //Skapa ny JTable
-
-            newTable = new JTable(r1.skomodellBetyg(activeButton.getText()), tableHeader); // Fyller newTable
+        JTable newTable;
+        newTable = new JTable(r1.skomodellBetyg(activeButton.getText()), tableHeader);
 
         newTable.setDragEnabled(false);
         newTable.getColumnModel().getColumn(0).setMaxWidth(100);
         newTable.getColumnModel().getColumn(1).setMaxWidth(100);
         newTable.getColumnModel().getColumn(2).setMinWidth(300);
         newTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-//        tableReview = newTable;
-        scrollPane.setViewportView(newTable); // Visar newTable
 
+        scrollPane.setViewportView(newTable);
     }
 
 }
