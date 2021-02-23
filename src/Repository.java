@@ -133,8 +133,9 @@ public class Repository {
             Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 
             ResultSet rs = stmt.executeQuery("Select lagerstatus from lagermappning where skomodellid = "+index+" and storlekid = (select id from storlek where skostorlek= "+storlek+") and färgid = (select färg.id from färg where färg = '"+färg+"')");
-            rs.next();
-            return rs.getString("lagerstatus");
+            while (rs.next()) {
+                return rs.getString("lagerstatus");
+            }
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -323,5 +324,28 @@ public class Repository {
             throwables.printStackTrace();
         }
         return null;
+    }
+
+    public int getSkomodellIDbyModell(String model){
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        try(Connection con = DriverManager.getConnection(
+                p.getProperty("connection"),
+                p.getProperty("user"),
+                p.getProperty("pw")))
+        {
+            PreparedStatement stmt = con.prepareStatement("select id from skomodell where skomodell = ?");
+            stmt.setString(1,model);
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                return rs.getInt("id");
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return -1;
     }
 }
