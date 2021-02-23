@@ -285,7 +285,7 @@ public class Repository {
         return -1;
     }
 
-    public String[][] skomodellBetyg(int skomodell){
+    public String[][] skomodellBetyg(String skomodell){
         List<String> result = new ArrayList<>();
         String[][] content;
         try(Connection con = DriverManager.getConnection(
@@ -293,7 +293,7 @@ public class Repository {
                 p.getProperty("user"),
                 p.getProperty("pw")))
         {
-            PreparedStatement stmt = con.prepareStatement("select kund.namn, betygskala.betyg, betyg.kommentar  from kund join betyg  on kund.id = kundID join betygskala  on betyg.betygskalaID = betygskala.id");
+            PreparedStatement stmt = con.prepareStatement("select kund.namn, betygskala.betyg, betyg.kommentar  from kund join betyg  on kund.id = kundID join betygskala  on betyg.betygskalaID = betygskala.id join skomodell on betyg.skomodellID = skomodell.id where skomodell = '"+skomodell+"'");
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
                 StringBuilder sb = new StringBuilder();

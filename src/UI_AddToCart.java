@@ -72,6 +72,7 @@ public class UI_AddToCart extends JPanel {
                 }
             });
             add(jb);
+            activeButton = jb;
         }
         add(labelProductImage);
         add(jtfPris);
@@ -129,14 +130,12 @@ public class UI_AddToCart extends JPanel {
         buttonAddToCart.setText("Lägg i kundvagn!");
     }
 
-    boolean flipthisshit = true; //För att det ska variera
+
     private void updateReviewTable() {
         JTable newTable; //Skapa ny JTable
-        if(flipthisshit){
-            newTable = new JTable(mockReview2, tableHeader); // Fyller newTable
-        } else {
-            newTable = new JTable(mockReview1, tableHeader);
-        }
+
+            newTable = new JTable(r1.skomodellBetyg(activeButton.getText()), tableHeader); // Fyller newTable
+
         newTable.setDragEnabled(false);
         newTable.getColumnModel().getColumn(0).setMaxWidth(100);
         newTable.getColumnModel().getColumn(1).setMaxWidth(100);
@@ -144,7 +143,7 @@ public class UI_AddToCart extends JPanel {
         newTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 //        tableReview = newTable;
         scrollPane.setViewportView(newTable); // Visar newTable
-        flipthisshit = !flipthisshit;
+
     }
 
 }
