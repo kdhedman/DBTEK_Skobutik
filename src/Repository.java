@@ -402,7 +402,7 @@ public class Repository {
         return true;
     }
 
-    public int getSkomodellAverageBetyg(int modelID){
+    public float getSkomodellAverageBetyg(int modelID){
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
@@ -414,10 +414,10 @@ public class Repository {
                 p.getProperty("pw")))
         {
             PreparedStatement stmt = con.prepareStatement("select get_medelbetyg(?) as Medelbetyg");
-            stmt.setInt(1,modelID);
+            stmt.setFloat(1,modelID);
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
-                return rs.getInt("Medelbetyg");
+                return rs.getFloat("Medelbetyg");
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();

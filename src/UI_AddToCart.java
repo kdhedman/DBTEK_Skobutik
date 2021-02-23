@@ -10,7 +10,7 @@ public class UI_AddToCart extends JPanel {
     JLabel labelProductImage = new JLabel(imageIcon);
     JTextField jtfPris = new JTextField("Text");
     JTextField jtfLagerStatus = new JTextField("I lager: ");
-    JTextField jtfMedelbetyg = new JTextField("Medelbetyg: ");
+    JFormattedTextField jtfMedelbetyg = new JFormattedTextField();
 
     JComboBox jComboBoxStorlekar = new JComboBox();
     JComboBox jComboBoxColor = new JComboBox();
@@ -165,8 +165,8 @@ public class UI_AddToCart extends JPanel {
 
     private void updateMedelbetyg(){
         int skoId = r1.getSkomodellIDbyModell(activeButton.getText());
-        int medelbetyg  = r1.getSkomodellAverageBetyg(skoId);
-        jtfMedelbetyg.setText("Medelbetyg: "+medelbetyg);
+        float medelbetyg  = r1.getSkomodellAverageBetyg(skoId);
+        jtfMedelbetyg.setText(String.format("Medel betyg: %1.1f",medelbetyg));
         if (medelbetyg == 0) jtfMedelbetyg.setText("Ej betygsatt.");
     }
 
