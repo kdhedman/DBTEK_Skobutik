@@ -421,7 +421,7 @@ begin
     end if;
 end//
 delimiter ;
-
+-- Stored Procedure
 delimiter //
 CREATE
     DEFINER = `skobutik`@`%` PROCEDURE `Stored_Procedure_Add_to_Cart`(Skomodell int, Kund int, StorlekIN int, FärgIN varchar(20))
@@ -453,7 +453,7 @@ BEGIN
         if kund != all (select kundid from leverans) then
             insert into leverans (kundiD) values (kund);
         end if;
--- if skomodell = any(select skomodellid from beställning join leverans on leverans.id = beställning.leveransid join lagermappning on beställning.lagermappningsId = lagermappning.id where kundid=kund)  then
+
         if variable_lagermappningsID = any (select lagermappningsid
                                             from beställning
                                                      join leverans on leverans.id = beställning.leveransid
@@ -481,7 +481,7 @@ BEGIN
                               and färgid = (select färg.id from färg where färg = FärgIN)
                               and skomodellid = skomodell),
                         (select id from leverans where kundid = kund order by datum asc limit 1));
--- insert into beställning (Skomodellid, kvantitet, storlekID, färgID, leveransID) values(skomodell, 1,(select storlek.id from storlek where Skostorlek= StorlekIN), (select färg.id from färg  where färg= FärgIN),(select id from leverans where kundid=kund  order by datum asc limit 1));
+
                 update lagermappning
                 set lagerstatus = (lagerstatus - 1)
                 where storlekID = (select id from storlek where skostorlek = StorlekIN)
@@ -491,4 +491,38 @@ BEGIN
         end if;
     end if;
 END
+
+CREATE DEFINER=`skobutik`@`%` PROCEDURE `Stored_Procedure_Rate`(Grade int, comment1 varchar (150), customerIDIN int, skomodellIDIN int )
+BEGIN
+declare variable_existingRating int;
+select id into variable_existingRating  from betyg where skomodellid = skomodellIDIN and kundid = customerIDIN;
+if variable_existingRating > 1 then delete from betyg where skomodellid = skomodellIDIN and kundid = customerIDIN;
+end if;
+insert into betyg (betygskalaid, kommentar, kundid,skomodellid) values
+((grade),(comment1),(customerIDIN),(skomodellIDIN));
+
+END
 delimiter;
+-- Function.
+CREATE DEFINER=`skobutik`@`%` FUNCTION `get_medelbetyg`(skomodellIN int) RETURNS float
+    READS SQL DATA
+BEGIN
+
+return (select avg(betygskalaid) as 'Medelbetyg' from betyg where skomodellID = skomodellIN);
+END
+
+-- View
+CREATE
+ALGORITHM = UNDEFINED
+    DEFINER = `skobutik`@`%`
+    SQL SECURITY DEFINER
+VIEW `grade_view` AS
+SELECT
+    `skomodell`.`skomodell` AS `skomodell`,
+    `betygskala`.`betyg` AS  `Genomsnittligt omdömme`,
+    AVG(betyg.betygskalaID) AS `Genomsnittligt betyg`
+FROM
+    (skomodell
+        LEFT JOIN (betyg
+            JOIN betygskala ON ((betyg.betygskalaID = betygskala.id))) ON ((betyg.skomodellID = skomodell.id)))
+GROUP BY skomodell.skomodell
