@@ -74,7 +74,7 @@ public class LoginPanel extends JPanel  {
         boolean success = db_rep.tryLogin(username, password);
         System.out.println(success ? "Login: Success!" : "Login: Fail");
         if(success){
-            Kund kund = new Kund(username, db_rep.getKundIDFromNamn(username));
+            Kund kund = new Kund(db_rep.getKundIDFromNamn(username), username, null, null);
             ActiveKund.setKund(kund);
             MainFrame mf = MainFrame.getInstance();
             UI_AddToCart store = new UI_AddToCart();
