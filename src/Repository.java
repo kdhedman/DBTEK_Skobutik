@@ -285,6 +285,35 @@ public class Repository {
         return -1;
     }
 
+    public String[][] skomodellBetyg(int skomodell){
+        List<String> result = new ArrayList<>();
+        String[][] content;
+        try(Connection con = DriverManager.getConnection(
+                p.getProperty("connection"),
+                p.getProperty("user"),
+                p.getProperty("pw")))
+        {
+            PreparedStatement stmt = con.prepareStatement("select kund.namn, betygskala.betyg, betyg.kommentar  from kund join betyg  on kund.id = kundID join betygskala  on betyg.betygskalaID = betygskala.id");
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                StringBuilder sb = new StringBuilder();
+                sb.append(rs.getString("namn") + "#");
+                sb.append(rs.getString("betyg") +"#");
+                sb.append(rs.getString("kommentar") +"#");
+                result.add(sb.toString());
+            }
+            content = new String[result.size()][3];
+            for (int i = 0; i < result.size(); i++) {
+                String[] temp = result.get(i).split("#");
+                content[i] = temp;
+            }
+            return content;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
+    }
+
     public String[][] getKundsBeställningar(String namn){
         List<String> result = new ArrayList<>();
         String[][] content;
