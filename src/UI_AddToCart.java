@@ -14,6 +14,17 @@ public class UI_AddToCart extends JPanel {
     JButton buttonAddToCart = new JButton("Lägg i kundvagn");
     JButton buttonShowCart = new JButton("Visa kundvagn");
     JButton activeButton;
+    JScrollPane scrollPane = new JScrollPane();
+    String[][] mockReview1 = {
+            {"Elin", "4", "For the lulz"},
+            {"Jesper", "1", "Nononononono, inte nu, inte någonsin!"},
+            {"Sigrun", "3", "Mja, varför inte?"}
+    };
+    String[][] mockReview2 = {
+            {"Borat", "5", "Very nice, yes!"},
+            {"Ali G", "5", "Boyakasha!"}
+    };
+    String[] tableHeader = {"Användare", "Betyg", "Kommentar"};
 
 
     public UI_AddToCart() {
@@ -54,15 +65,7 @@ public class UI_AddToCart extends JPanel {
                         jComboBoxColor.addItem(temp2.get(i));
                     }
                     updateLagerstatus();
-
-//                    String color = null;
-//                    color = (String) jComboBoxColor.getSelectedItem();
-//                    int lagerstatus = Integer.parseInt(r1.getLagerstatusFromDatabase(finalIndex, Integer.parseInt((String) jComboBoxStorlekar.getSelectedItem()), color));
-//                    jtfLagerStatus.setText("I lager: " + lagerstatus);
-//                    System.out.println(color);
-//                    System.out.println(Integer.parseInt((String) jComboBoxStorlekar.getSelectedItem()));
-//                    buttonAddToCart.setEnabled((lagerstatus > 0));
-//                    buttonAddToCart.setText("Lägg i kundvagn!");
+                    updateReviewTable();
 
                     id1[0] = finalIndex;
 
@@ -77,6 +80,8 @@ public class UI_AddToCart extends JPanel {
         add(jtfLagerStatus);
         add(buttonAddToCart);
         add(buttonShowCart);
+        updateReviewTable();
+        add(scrollPane);
 
         jComboBoxStorlekar.addActionListener(e -> {
             jComboBoxColor.removeAllItems();
@@ -123,4 +128,23 @@ public class UI_AddToCart extends JPanel {
         buttonAddToCart.setEnabled(lagerstatus > 0);
         buttonAddToCart.setText("Lägg i kundvagn!");
     }
+
+    boolean flipthisshit = true; //För att det ska variera
+    private void updateReviewTable() {
+        JTable newTable; //Skapa ny JTable
+        if(flipthisshit){
+            newTable = new JTable(mockReview2, tableHeader); // Fyller newTable
+        } else {
+            newTable = new JTable(mockReview1, tableHeader);
+        }
+        newTable.setDragEnabled(false);
+        newTable.getColumnModel().getColumn(0).setMaxWidth(100);
+        newTable.getColumnModel().getColumn(1).setMaxWidth(100);
+        newTable.getColumnModel().getColumn(2).setMinWidth(300);
+        newTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+//        tableReview = newTable;
+        scrollPane.setViewportView(newTable); // Visar newTable
+        flipthisshit = !flipthisshit;
+    }
+
 }
