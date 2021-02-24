@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 public class Store extends JPanel {
     Repository r1 = new Repository();
     List<Skomodell> shoes = r1.getSkomodellerAsOBjects();
+    JButton activeButton;
+    Skomodell activeShoe;
 
 
     JLabel labelWelcome = new JLabel("Välkommen, " + ActiveKund.getKund().getNamn() + "!");
@@ -24,17 +26,16 @@ public class Store extends JPanel {
     JLabel labelProductImage = new JLabel(imageIconShoe);
     JLabel labelProduct = new JLabel("SkomodellSkomodell");
     JLabel labelPris = new JLabel("Pris: Woowee!");
-    JLabel labelColor = new JLabel("Färg");
-    JLabel labelStorlek = new JLabel("Storlek");
-
+    JLabel labelColor = new JLabel("Färg       ");
+    JLabel labelStorlek = new JLabel("Storlek     ");
     JLabel labelLagerstatus = new JLabel("I lager: ");
+
     JFormattedTextField jtfMedelbetyg = new JFormattedTextField();
 
     JComboBox comboBoxStorlekar = new JComboBox();
     JComboBox comboBoxColor = new JComboBox();
     JButton buttonAddToCart = new JButton("Lägg i kundvagn");
     JButton buttonShowCart = new JButton("Visa kundvagn");
-    JButton activeButton;
     JScrollPane scrollPane = new JScrollPane();
     String[] tableHeader = {"Användare", "Betyg", "Kommentar"};
     JLabel labelBetyg = new JLabel("Betyg: ");
@@ -49,14 +50,12 @@ public class Store extends JPanel {
         setLocationAndSize(); //Det här ingår där också, kommentera bort för gamla design.
         addComponents();
         editComponents();
-        addActionListeners();
         updateGUI();
+        addActionListeners();
 //        drawBackground();
     }
 
     public static void main(String[] args) {
-        System.out.println(javax.swing.UIManager.getDefaults().getFont("Label.font"));
-
         Kund kund = new Kund(2, "Elin", null, null);
         ActiveKund.setKund(kund);
         JFrame frame = new JFrame();
@@ -77,10 +76,11 @@ public class Store extends JPanel {
         labelProductImage.setBounds(20,110,200,200);
         labelProduct.setBounds(220, 130, 200, 30);
         labelPris.setBounds(220,150,100,40);
-        labelStorlek.setBounds(220, 170, 50, 40);
-        comboBoxStorlekar.setBounds(220, 205, 50, 40);
-        labelColor.setBounds(280, 170, 60,40);
-        comboBoxColor.setBounds(280, 205, 60, 40);
+        labelStorlek.setBounds(220, 170, 60, 40);
+        comboBoxStorlekar.setBounds(220, 205, 60, 40);
+        labelColor.setBounds(290, 170, 60,40);
+        comboBoxColor.setBounds(290, 205, 60, 40);
+        labelLagerstatus.setBounds(220, 240, 100, 30);
     }
 
     private void editComponents(){
@@ -104,6 +104,7 @@ public class Store extends JPanel {
         add(comboBoxColor);
         add(labelStorlek);
         add(comboBoxStorlekar);
+        add(labelLagerstatus);
     }
 
     private void addShoeButtons(JPanel container){
@@ -112,7 +113,6 @@ public class Store extends JPanel {
             JButton button = new JButton(shoe.skomodell);
             activeButton = button;
             int width = button.getWidth();
-            System.out.println("width = " + width);
             button.setPreferredSize(new Dimension(110, 50));
             addShoeButtonActionListener(button);
             container.add(button);
@@ -138,21 +138,24 @@ public class Store extends JPanel {
                 //I Don't care!
             }
         });
+
+        comboBoxColor.addActionListener(l -> {
+            updateLabelLagerStatus();
+        });
     }
 
-    private void updateGUI(){
-        Skomodell activeShoe = shoes.stream().filter(shoe -> shoe.getSkomodell().equals(activeButton.getText())).findFirst().get();
+    private void updateGUI() throws InterruptedException {
+        activeShoe = shoes.stream().filter(shoe -> shoe.getSkomodell().equals(activeButton.getText())).findFirst().get();
 
         labelProductImage.setIcon(new ImageIcon("res/Pictures/" + activeShoe.getSkomodell() + ".png"));
         labelProduct.setText(activeShoe.getSkomodell());
-        labelPris.setText(String.valueOf(activeShoe.pris));
+        labelPris.setText(String.format("%s valuta", String.valueOf(activeShoe.pris)));
 
 
         comboBoxStorlekar.removeAllItems();
         List<Integer> sizes = activeShoe.sizeColorQuantityMap.keySet().stream().map(Storlek::getSkostorlek).collect(Collectors.toList());
         Collections.sort(sizes);
         sizes.stream().forEach(size -> comboBoxStorlekar.addItem(size));
-
         try {
             updateComboBoxColors();
         } catch (NullPointerException e) {
@@ -162,13 +165,26 @@ public class Store extends JPanel {
 
     private void updateComboBoxColors() throws NullPointerException{
         comboBoxColor.removeAllItems();
-        Skomodell activeShoe = shoes.stream().filter(shoe -> shoe.getSkomodell().equals(activeButton.getText())).findFirst().get();
         List<String> colors = activeShoe.sizeColorQuantityMap.get(
                 activeShoe.sizeColorQuantityMap.keySet().
                         stream().filter(size -> size.getSkostorlek() == (int)comboBoxStorlekar.getSelectedItem()).findFirst().get()).
                 keySet().stream().map(Färg::getFärg).collect(Collectors.toList());
         Collections.sort(colors);
         colors.stream().forEach(color -> comboBoxColor.addItem(color));
+    }
+
+    private void updateLabelLagerStatus(){
+
+        Storlek storlek = activeShoe.sizeColorQuantityMap.keySet().stream().filter(
+                size -> size.getSkostorlek() == (int)comboBoxStorlekar.getSelectedItem()).findFirst().get();
+        System.out.println(storlek.toString());
+        Färg color = activeShoe.sizeColorQuantityMap.get(storlek).keySet().stream().filter(
+                c -> c.färg.equals(comboBoxColor.getSelectedItem())).findFirst().get();
+        int lagerstatus = activeShoe.sizeColorQuantityMap.get(storlek).get(color).lagerstatus;
+    }
+
+    private void updateLagerStatus(){
+        //        int lagerstatus = Integer.parseInt(r1.getLagerstatusFromDatabase(skoId, Integer.parseInt((String) comboBoxStorlekar.getSelectedItem()), color));
     }
 
     public void drawBackground() {
@@ -198,7 +214,7 @@ public class Store extends JPanel {
                     for (int i = 0; i < temp2.size(); i++) {
                         comboBoxColor.addItem(temp2.get(i));
                     }
-                    updateLagerstatus();
+//                    updateLagerstatus();
                     updateMedelbetyg();
                     updateReviewTable();
 
@@ -242,7 +258,7 @@ public class Store extends JPanel {
                 for (int i = 0; i < temp.size(); i++) {
                     comboBoxColor.addItem(temp.get(i));
                 }
-                updateLagerstatus();
+//                updateLabelLagerStatus();
             } catch (NumberFormatException numberFormatException) {
                 //Let's ignore this
             }
@@ -250,7 +266,7 @@ public class Store extends JPanel {
 
         comboBoxColor.addActionListener(e-> {
             try {
-                updateLagerstatus();
+//                updateLabelLagerStatus();
             } catch (NumberFormatException numberFormatException) {
                 //NOUP
             }
@@ -298,16 +314,6 @@ public class Store extends JPanel {
         updateMedelbetyg();
     }
 
-    private void updateLagerstatus() throws NumberFormatException{
-        int skoId = r1.getSkomodellIDbyModell(activeButton.getText());
-        String color = (String) comboBoxColor.getSelectedItem();
-        int lagerstatus = Integer.parseInt(r1.getLagerstatusFromDatabase(skoId, Integer.parseInt((String) comboBoxStorlekar.getSelectedItem()), color));
-        labelLagerstatus.setText("I lager: " + lagerstatus);
-        buttonAddToCart.setEnabled(lagerstatus > 0);
-        buttonAddToCart.setText("Lägg i kundvagn!");
-        this.revalidate();
-    }
-
     private void updateMedelbetyg(){
         int skoId = r1.getSkomodellIDbyModell(activeButton.getText());
         float medelbetyg  = r1.getSkomodellAverageBetyg(skoId);
@@ -315,6 +321,16 @@ public class Store extends JPanel {
         if (medelbetyg == 0) jtfMedelbetyg.setText("Ej betygsatt.");
     }
 
+
+//    private void updateLagerstatus() throws NumberFormatException{
+//        int skoId = r1.getSkomodellIDbyModell(activeButton.getText());
+//        String color = (String) comboBoxColor.getSelectedItem();
+//        int lagerstatus = Integer.parseInt(r1.getLagerstatusFromDatabase(skoId, Integer.parseInt((String) comboBoxStorlekar.getSelectedItem()), color));
+//        labelLagerstatus.setText("I lager: " + lagerstatus);
+//        buttonAddToCart.setEnabled(lagerstatus > 0);
+//        buttonAddToCart.setText("Lägg i kundvagn!");
+//        this.revalidate();
+//    }
 
     private void updateReviewTable() {
         JTable newTable;
