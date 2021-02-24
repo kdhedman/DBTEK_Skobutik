@@ -29,7 +29,6 @@ public class LoginPanel extends JPanel  {
 
         userLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         passwordLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-
     }
 
     private void setLocationAndSize(){
