@@ -12,6 +12,7 @@ public class Skomodell {
     public int pris;
     public Märke märke;
     public Map<Storlek, List<Färg>> sizeColorMap = new HashMap<>();
+    public Map<Storlek, Map<Färg, LagerStatus>> sizeColorQuantityMap = new HashMap<>();
     public List<Kategori> kategorier = new ArrayList<>();
 
     public Skomodell(int id, String skomodell, int pris, Märke märke){

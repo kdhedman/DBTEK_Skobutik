@@ -36,7 +36,7 @@ public class Repository {
             System.out.printf("Skomodell: %s id: %d Pris: %d\n", shoe.skomodell, shoe.id, shoe.pris);
             System.out.println("Antal Storlekar: " + shoe.sizeColorMap.keySet().size());
             for (Storlek size : shoe.sizeColorMap.keySet()) {
-                System.out.printf("Storlek: %d Färger %s", size.skostorlek, shoe.sizeColorMap.get(size).toString());
+                System.out.printf("Storlek: %d Färger %s\n", size.skostorlek, shoe.sizeColorMap.get(size).toString());
             }
             System.out.println("\n");
         }
@@ -402,7 +402,7 @@ public class Repository {
                     ResultSet rsColor = stmtColors.executeQuery();
 
                     while (rsColor.next()) {
-                        int colorID = rsColor.getInt(1);
+                        int colorID = rsColor.getInt("FärgID");
                         skomodell.sizeColorMap.get(sizeMap.get(storlekID)).add(colorMap.get(colorID));
                     }
                 }
