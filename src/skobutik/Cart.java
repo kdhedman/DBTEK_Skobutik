@@ -1,3 +1,8 @@
+package skobutik;
+
+import iodb.Repository;
+import dbObjects.ActiveKund;
+
 import javax.swing.*;
 
 public class Cart extends JPanel {
@@ -50,7 +55,7 @@ public class Cart extends JPanel {
     private void addActionListeners(){
         buttonBackToStore.addActionListener(e -> {
             MainFrame mf = MainFrame.getInstance();
-            UI_AddToCart store = new UI_AddToCart();
+            Store store = new Store();
             mf.changeView(store);
         });
     }

@@ -1,3 +1,7 @@
+package skobutik;
+
+import iodb.Repository;
+import dbObjects.ActiveKund;
 import dbObjects.Kund;
 
 import javax.swing.*;
@@ -77,7 +81,7 @@ public class LoginPanel extends JPanel  {
             Kund kund = new Kund(db_rep.getKundIDFromNamn(username), username, null, null);
             ActiveKund.setKund(kund);
             MainFrame mf = MainFrame.getInstance();
-            UI_AddToCart store = new UI_AddToCart();
+            Store store = new Store();
             mf.changeView(store);
         } else {
             errorMessage.setText("Nähä, du! Där gick det fel!");

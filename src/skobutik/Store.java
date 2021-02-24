@@ -1,9 +1,14 @@
+package skobutik;
+
+import iodb.Repository;
+import dbObjects.ActiveKund;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-public class UI_AddToCart extends JPanel {
+public class Store extends JPanel {
     Repository r1 = new Repository();
     ImageIcon imageIcon = new ImageIcon("res/Pictures/placeholder.jpg");
     JLabel labelWelcome = new JLabel("Välkommen, " + ActiveKund.getKund().getNamn() + "!");
@@ -27,7 +32,7 @@ public class UI_AddToCart extends JPanel {
     JButton buttonRate = new JButton("Åsikta dig!");
 
 
-    public UI_AddToCart() {
+    public Store() {
 //        setLayout(null);  // Testar annan layoutform
 //        setLocationAndSize(); //Det här ingår där också, kommentera bort för gamla design.
         drawBackground();

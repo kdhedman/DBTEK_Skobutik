@@ -1,4 +1,4 @@
-import com.sun.tools.javac.Main;
+package skobutik;
 
 import javax.swing.*;
 

@@ -1,4 +1,4 @@
-import dbObjects.Kund;
+package dbObjects;
 
 public class ActiveKund {
     private static Kund kund;

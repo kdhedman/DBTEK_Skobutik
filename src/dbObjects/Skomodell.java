@@ -9,9 +9,9 @@ public class Skomodell {
     String skomodell;
     int pris;
     Märke märke;
-    List<Storlek> storlekar = new ArrayList<>();
-    List<Färg> färger = new ArrayList<>();
-    List<Kategori> kategorier = new ArrayList<>();
+    private List<Storlek> storlekar = new ArrayList<>();
+    private List<Färg> färger = new ArrayList<>();
+    private List<Kategori> kategorier = new ArrayList<>();
 
     public Skomodell(int id, String skomodell, int pris, Märke märke){
         this.id = id;
@@ -19,5 +19,12 @@ public class Skomodell {
         this.pris = pris;
         this.märke = märke;
 //        map.put(id, this);
+    }
+
+    public List<Storlek> getStorlekar(){
+        if(storlekar.isEmpty()){
+
+        }
+        return storlekar;
     }
 }
