@@ -423,73 +423,30 @@ end//
 delimiter ;
 -- Stored Procedure
 delimiter //
-CREATE
-    DEFINER = `skobutik`@`%` PROCEDURE `Stored_Procedure_Add_to_Cart`(Skomodell int, Kund int, StorlekIN int, FärgIN varchar(20))
+CREATE DEFINER=`skobutik`@`%` PROCEDURE `Stored_Procedure_Add_to_Cart`(Skomodell int, Kund int , StorlekIN int, FärgIN varchar(20))
 BEGIN
     declare variable_temp date default null;
     declare variable_lagermappningsID int;
-    select id
-    into variable_lagermappningsID
-    from Lagermappning
-    where storlekID = (select id from storlek where skostorlek = StorlekIN)
-      and färgid = (select färg.id from färg where färg = FärgIN)
-      and skomodellid = skomodell;
-    select datum into variable_temp from leverans where kundid = kund order by datum asc limit 1;
-    if variable_temp is not null then
-        insert into leverans (kundiD) values (kund);
-        insert into beställning (kvantitet, lagermappningsid, leveransID)
-        values (1, (select id
-                    from Lagermappning
-                    where storlekID = (select id from storlek where skostorlek = StorlekIN)
-                      and färgid = (select färg.id from färg where färg = FärgIN)
-                      and skomodellid = skomodell), last_insert_id());
-        update lagermappning
-        set lagerstatus = (lagerstatus - 1)
-        where storlekID = (select id from storlek where skostorlek = StorlekIN)
-          and färgid = (select färg.id from färg where färg = FärgIN)
-          and skomodellid = Skomodell;
-    end if;
+select id into variable_lagermappningsID from Lagermappning where storlekID = (select id from storlek where skostorlek = StorlekIN) and färgid = (select färg.id from färg where färg =FärgIN) and skomodellid = skomodell;
+select datum into variable_temp from leverans where kundid=kund  order by datum asc limit 1;
+if variable_temp is not null then
+        insert into leverans  (kundiD)values (kund);
+insert into beställning (kvantitet, lagermappningsid, leveransID) values(1,(select id from Lagermappning where storlekID = (select id from storlek where skostorlek = StorlekIN) and färgid = (select färg.id from färg where färg =FärgIN) and skomodellid = skomodell), last_insert_id());
+update lagermappning set lagerstatus = (lagerstatus - 1) where id  = variable_lagermappningsID;
+end if;
     if variable_temp is null then
-        if kund != all (select kundid from leverans) then
-            insert into leverans (kundiD) values (kund);
-        end if;
-
-        if variable_lagermappningsID = any (select lagermappningsid
-                                            from beställning
-                                                     join leverans on leverans.id = beställning.leveransid
-                                                     join lagermappning on beställning.lagermappningsId = lagermappning.id
-                                            where kundid = kund) then
-            update beställning
-            set kvantitet = (kvantitet + 1)
-            where leveransid = (select id from leverans where kundid = kund order by id desc limit 1)
-              and lagermappningsid = variable_lagermappningsID;
-            update lagermappning
-            set lagerstatus = (lagerstatus - 1)
-            where storlekID = (select id from storlek where skostorlek = StorlekIN)
-              and färgid = (select färg.id from färg where färg = FärgIN)
-              and skomodellid = Skomodell;
-        else
-            if variable_lagermappningsID != all (select lagermappningsid
-                                                 from beställning
-                                                          join leverans on leverans.id = beställning.leveransid
-                                                          join lagermappning on beställning.lagermappningsId = lagermappning.id
-                                                 where kundid = kund) then
-                insert into beställning (kvantitet, lagermappningsid, leveransID)
-                values (1, (select id
-                            from Lagermappning
-                            where storlekID = (select id from storlek where skostorlek = StorlekIN)
-                              and färgid = (select färg.id from färg where färg = FärgIN)
-                              and skomodellid = skomodell),
-                        (select id from leverans where kundid = kund order by datum asc limit 1));
-
-                update lagermappning
-                set lagerstatus = (lagerstatus - 1)
-                where storlekID = (select id from storlek where skostorlek = StorlekIN)
-                  and färgid = (select färg.id from färg where färg = FärgIN)
-                  and skomodellid = Skomodell;
-            end if;
-        end if;
-    end if;
+        if kund != all(select kundid from leverans) then
+            insert into leverans  (kundiD)values (kund);
+end if;
+        if variable_lagermappningsID = any(select lagermappningsid from beställning join leverans on leverans.id = beställning.leveransid join lagermappning on beställning.lagermappningsId = lagermappning.id where kundid=kund)  then
+update beställning set kvantitet = (kvantitet+1) where leveransid = (select id from leverans where kundid=kund  order by id desc limit 1) and lagermappningsid = variable_lagermappningsID;
+update lagermappning set lagerstatus = (lagerstatus - 1) where id  = variable_lagermappningsID;
+else if variable_lagermappningsID != all (select lagermappningsid from beställning join leverans on leverans.id = beställning.leveransid join lagermappning on beställning.lagermappningsId = lagermappning.id where kundid=kund) then
+            insert into beställning (kvantitet, lagermappningsid, leveransID) values(1,(select id from Lagermappning where storlekID = (select id from storlek where skostorlek = StorlekIN) and färgid = (select färg.id from färg where färg =FärgIN)and skomodellid = skomodell),(select id from leverans where kundid=kund  order by datum asc limit 1));
+update lagermappning set lagerstatus = (lagerstatus - 1) where id  = variable_lagermappningsID;
+end if;
+end if;
+end if;
 END
 
 CREATE DEFINER=`skobutik`@`%` PROCEDURE `Stored_Procedure_Rate`(Grade int, comment1 varchar (150), customerIDIN int, skomodellIDIN int )
