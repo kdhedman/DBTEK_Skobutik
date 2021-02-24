@@ -1,17 +1,18 @@
 package dbObjects;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Skomodell {
 //    public static Map<Integer, Skomodell> map = new HashMap<>();
-    int id;
-    String skomodell;
-    int pris;
-    Märke märke;
-    private List<Storlek> storlekar = new ArrayList<>();
-    private List<Färg> färger = new ArrayList<>();
-    private List<Kategori> kategorier = new ArrayList<>();
+    public int id;
+    public String skomodell;
+    public int pris;
+    public Märke märke;
+    public Map<Storlek, List<Färg>> sizeColorMap = new HashMap<>();
+    public List<Kategori> kategorier = new ArrayList<>();
 
     public Skomodell(int id, String skomodell, int pris, Märke märke){
         this.id = id;
@@ -19,12 +20,5 @@ public class Skomodell {
         this.pris = pris;
         this.märke = märke;
 //        map.put(id, this);
-    }
-
-    public List<Storlek> getStorlekar(){
-        if(storlekar.isEmpty()){
-
-        }
-        return storlekar;
     }
 }

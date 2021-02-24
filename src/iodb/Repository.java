@@ -1,11 +1,13 @@
 package iodb;
 
+import dbObjects.Färg;
+import dbObjects.Skomodell;
+import dbObjects.Storlek;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class Repository {
 
@@ -29,6 +31,15 @@ public class Repository {
 
     public static void main(String[] args) {
         Repository repo = new Repository();
+        List<Skomodell> shoes = repo.getSkomodellerAsOBjects();
+        for (var shoe : shoes) {
+            System.out.printf("Skomodell: %s id: %d Pris: %d\n", shoe.skomodell, shoe.id, shoe.pris);
+            System.out.println("Antal Storlekar: " + shoe.sizeColorMap.keySet().size());
+            for (Storlek size : shoe.sizeColorMap.keySet()) {
+                System.out.printf("Storlek: %d Färger %s", size.skostorlek, shoe.sizeColorMap.get(size).toString());
+            }
+            System.out.println("\n");
+        }
     }
 
     private boolean testingDBConnection() {
@@ -192,8 +203,12 @@ public class Repository {
                 this.connection,
                 this.user,
                 this.password)) {
-            Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-            stmt.executeQuery("call Stored_Procedure_Add_to_Cart (" + skomodelId + "," + kundId + "," + storlek + ",'" + färg + "')");
+            PreparedStatement stmt = con.prepareStatement("call Stored_Procedure_Add_to_Cart (?,?,?,?)");
+            stmt.setString(1, String.valueOf(skomodelId));
+            stmt.setString(2, String.valueOf(kundId));
+            stmt.setString(3, String.valueOf(storlek));
+            stmt.setString(4, String.valueOf(färg));
+            stmt.executeQuery();
             System.out.println("kallad på!");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -337,5 +352,67 @@ public class Repository {
             e.printStackTrace();
         }
         return -1;
+    }
+
+    public List<Skomodell> getSkomodellerAsOBjects() {
+        Map<Integer, Färg> colorMap = new HashMap<>();
+        Map<Integer, Storlek> sizeMap = new HashMap<>();
+        List<Skomodell> result = new ArrayList<>();
+
+        try (Connection con = DriverManager.getConnection(
+                this.connection,
+                this.user,
+                this.password)) {
+            Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            ResultSet rs = stmt.executeQuery("select * from färg");
+            //Set ColorMap
+            while (rs.next()) {
+                Färg tempColor = new Färg(rs.getInt("id"), rs.getString("färg"));
+                colorMap.put(tempColor.id, tempColor);
+            }
+            //Set SizeMap
+            rs = stmt.executeQuery("select * from storlek");
+            while (rs.next()) {
+                Storlek tempSize = new Storlek(rs.getInt("id"), rs.getInt("skostorlek"));
+                sizeMap.put(tempSize.id, tempSize);
+            }
+            //Fix shoes
+            rs = stmt.executeQuery("select * from skomodell");
+            while (rs.next()) {
+                Skomodell skomodell = new Skomodell(
+                        rs.getInt("id"),
+                        rs.getString("skomodell"),
+                        rs.getInt("pris"),
+                        null
+                );
+
+                //add size to list
+                PreparedStatement stmtSizes = con.prepareStatement("select distinct StorlekId from lagermappning where SkomodellId = ?");
+                stmtSizes.setString(1, String.valueOf(skomodell.id));
+                ResultSet rsSize = stmtSizes.executeQuery();
+
+                while (rsSize.next()) {
+                    int storlekID = rsSize.getInt("StorlekID");
+                    skomodell.sizeColorMap.put(sizeMap.get(storlekID), new ArrayList<>());
+
+                    //add color to sizeColorMap
+                    PreparedStatement stmtColors = con.prepareStatement("select distinct färgid from lagermappning where SkomodellId = ? and StorlekId = ?");
+                    stmtColors.setString(1, String.valueOf(skomodell.id));
+                    stmtColors.setString(2, String.valueOf(storlekID));
+                    ResultSet rsColor = stmtColors.executeQuery();
+
+                    while (rsColor.next()) {
+                        int colorID = rsColor.getInt(1);
+                        skomodell.sizeColorMap.get(sizeMap.get(storlekID)).add(colorMap.get(colorID));
+                    }
+                }
+
+                result.add(skomodell);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 }
