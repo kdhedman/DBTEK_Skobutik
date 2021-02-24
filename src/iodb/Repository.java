@@ -56,7 +56,6 @@ public class Repository {
             ResultSet rs = stmt.executeQuery("select * from kund limit 1");
             while (rs.next()) {
             }
-            System.out.println("DatabaseConnection Established");
             return true;
         } catch (SQLException e) {
             System.out.println("Someting wrong with Database Connection");
