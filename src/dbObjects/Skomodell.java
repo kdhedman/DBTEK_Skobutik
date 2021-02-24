@@ -21,4 +21,8 @@ public class Skomodell {
         this.märke = märke;
 //        map.put(id, this);
     }
+
+    public String getSkomodell() {
+        return skomodell;
+    }
 }

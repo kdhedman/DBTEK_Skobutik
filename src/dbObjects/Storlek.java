@@ -11,6 +11,10 @@ public class Storlek {
 //        map.put(id, this);
     }
 
+    public int getSkostorlek() {
+        return skostorlek;
+    }
+
     @Override
     public String toString() {
         return "Storlek{" +

@@ -1,24 +1,37 @@
 package skobutik;
 
+import dbObjects.*;
 import iodb.Repository;
-import dbObjects.ActiveKund;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Store extends JPanel {
     Repository r1 = new Repository();
-    ImageIcon imageIcon = new ImageIcon("res/Pictures/placeholder.jpg");
+    List<Skomodell> shoes = r1.getSkomodellerAsOBjects();
+
+
     JLabel labelWelcome = new JLabel("Välkommen, " + ActiveKund.getKund().getNamn() + "!");
-    JLabel labelProductImage = new JLabel(imageIcon);
-    JTextField jtfPris = new JTextField("Text");
-    JTextField jtfLagerStatus = new JTextField("I lager: ");
+    JPanel shoeContainer = new JPanel(new FlowLayout(FlowLayout.CENTER,4,4));
+    JScrollPane scrollPaneShoes = new JScrollPane(shoeContainer, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+    ImageIcon imageIconShoe = new ImageIcon("res/Pictures/placeholder.jpg");
+    JLabel labelProductImage = new JLabel(imageIconShoe);
+    JLabel labelProduct = new JLabel("SkomodellSkomodell");
+    JLabel labelPris = new JLabel("Pris: Woowee!");
+    JLabel labelColor = new JLabel("Färg");
+    JLabel labelStorlek = new JLabel("Storlek");
+
+    JLabel labelLagerstatus = new JLabel("I lager: ");
     JFormattedTextField jtfMedelbetyg = new JFormattedTextField();
 
-    JComboBox jComboBoxStorlekar = new JComboBox();
-    JComboBox jComboBoxColor = new JComboBox();
+    JComboBox comboBoxStorlekar = new JComboBox();
+    JComboBox comboBoxColor = new JComboBox();
     JButton buttonAddToCart = new JButton("Lägg i kundvagn");
     JButton buttonShowCart = new JButton("Visa kundvagn");
     JButton activeButton;
@@ -31,15 +44,131 @@ public class Store extends JPanel {
     JTextField comment = new JTextField("Kommentar (Max 50 tecken)");
     JButton buttonRate = new JButton("Åsikta dig!");
 
-
     public Store() {
-//        setLayout(null);  // Testar annan layoutform
-//        setLocationAndSize(); //Det här ingår där också, kommentera bort för gamla design.
-        drawBackground();
+        setLayout(null);  // Testar annan layoutform
+        setLocationAndSize(); //Det här ingår där också, kommentera bort för gamla design.
+        addComponents();
+        editComponents();
+        addActionListeners();
+        updateGUI();
+//        drawBackground();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(javax.swing.UIManager.getDefaults().getFont("Label.font"));
+
+        Kund kund = new Kund(2, "Elin", null, null);
+        ActiveKund.setKund(kund);
+        JFrame frame = new JFrame();
+        frame.setTitle("Skobutik");
+        frame.setSize(800, 600);
+        frame.setResizable(false);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        Store store = new Store();
+        frame.add(store);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 
     private void setLocationAndSize() {
-        labelWelcome.setBounds(10, 0, 100, 30);
+        labelWelcome.setBounds(0, 0, 800, 30);
+        //Maybe add categories here.
+        scrollPaneShoes.setBounds(5, 30, 775,76);
+        labelProductImage.setBounds(20,110,200,200);
+        labelProduct.setBounds(220, 130, 200, 30);
+        labelPris.setBounds(220,150,100,40);
+        labelStorlek.setBounds(220, 170, 50, 40);
+        comboBoxStorlekar.setBounds(220, 205, 50, 40);
+        labelColor.setBounds(280, 170, 60,40);
+        comboBoxColor.setBounds(280, 205, 60, 40);
+    }
+
+    private void editComponents(){
+        Font font = labelProduct.getFont();
+        labelWelcome.setHorizontalAlignment(SwingConstants.CENTER);
+        labelProduct.setHorizontalAlignment(SwingConstants.LEFT);
+        labelColor.setHorizontalAlignment(SwingConstants.CENTER);
+        labelStorlek.setHorizontalAlignment(SwingConstants.CENTER);
+
+        labelProduct.setFont(new Font(font.getName(), Font.PLAIN, 20));
+    }
+
+    private void addComponents(){
+        add(labelWelcome);
+        addShoeButtons(shoeContainer);
+        add(scrollPaneShoes);
+        add(labelProductImage);
+        add(labelProduct);
+        add(labelPris);
+        add(labelColor);
+        add(comboBoxColor);
+        add(labelStorlek);
+        add(comboBoxStorlekar);
+    }
+
+    private void addShoeButtons(JPanel container){
+        shoes.stream().forEach(shoe -> {
+
+            JButton button = new JButton(shoe.skomodell);
+            activeButton = button;
+            int width = button.getWidth();
+            System.out.println("width = " + width);
+            button.setPreferredSize(new Dimension(110, 50));
+            addShoeButtonActionListener(button);
+            container.add(button);
+        });
+    }
+
+    private void addShoeButtonActionListener(JButton button){
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                super.mouseEntered(e);
+                activeButton = button;
+                updateGUI();
+            }
+        });
+    }
+
+    private void addActionListeners(){
+        comboBoxStorlekar.addActionListener(l -> {
+            try {
+                updateComboBoxColors();
+            } catch (NullPointerException e) {
+                //I Don't care!
+            }
+        });
+    }
+
+    private void updateGUI(){
+        Skomodell activeShoe = shoes.stream().filter(shoe -> shoe.getSkomodell().equals(activeButton.getText())).findFirst().get();
+
+        labelProductImage.setIcon(new ImageIcon("res/Pictures/" + activeShoe.getSkomodell() + ".png"));
+        labelProduct.setText(activeShoe.getSkomodell());
+        labelPris.setText(String.valueOf(activeShoe.pris));
+
+
+        comboBoxStorlekar.removeAllItems();
+        List<Integer> sizes = activeShoe.sizeColorQuantityMap.keySet().stream().map(Storlek::getSkostorlek).collect(Collectors.toList());
+        Collections.sort(sizes);
+        sizes.stream().forEach(size -> comboBoxStorlekar.addItem(size));
+
+        try {
+            updateComboBoxColors();
+        } catch (NullPointerException e) {
+            //I DONT CARE!
+        }
+    }
+
+    private void updateComboBoxColors() throws NullPointerException{
+        comboBoxColor.removeAllItems();
+        Skomodell activeShoe = shoes.stream().filter(shoe -> shoe.getSkomodell().equals(activeButton.getText())).findFirst().get();
+        List<String> colors = activeShoe.sizeColorQuantityMap.get(
+                activeShoe.sizeColorQuantityMap.keySet().
+                        stream().filter(size -> size.getSkostorlek() == (int)comboBoxStorlekar.getSelectedItem()).findFirst().get()).
+                keySet().stream().map(Färg::getFärg).collect(Collectors.toList());
+        Collections.sort(colors);
+        colors.stream().forEach(color -> comboBoxColor.addItem(color));
     }
 
     public void drawBackground() {
@@ -58,16 +187,16 @@ public class Store extends JPanel {
                     String sko1 = r1.getSkomodellFromDatabase(finalIndex);
                     update = new ImageIcon("res/Pictures/" + sko1 + ".png");
                     labelProductImage.setIcon(update);
-                    jtfPris.setText("Pris: " + r1.getPrisFromDatabase(finalIndex));
-                    jComboBoxStorlekar.removeAllItems();
+                    labelPris.setText("Pris: " + r1.getPrisFromDatabase(finalIndex));
+                    comboBoxStorlekar.removeAllItems();
                     ArrayList temp = r1.getStorlekarFromDatabase(finalIndex);
                     for (int i = 0; i < temp.size(); i++) {
-                        jComboBoxStorlekar.addItem(temp.get(i));
+                        comboBoxStorlekar.addItem(temp.get(i));
                     }
-                    jComboBoxColor.removeAllItems();
-                    ArrayList temp2 = r1.getfärgFromDatabase(finalIndex, Integer.parseInt((String) jComboBoxStorlekar.getSelectedItem()));
+                    comboBoxColor.removeAllItems();
+                    ArrayList temp2 = r1.getfärgFromDatabase(finalIndex, Integer.parseInt((String) comboBoxStorlekar.getSelectedItem()));
                     for (int i = 0; i < temp2.size(); i++) {
-                        jComboBoxColor.addItem(temp2.get(i));
+                        comboBoxColor.addItem(temp2.get(i));
                     }
                     updateLagerstatus();
                     updateMedelbetyg();
@@ -81,10 +210,10 @@ public class Store extends JPanel {
             activeButton = jb;
         }
         add(labelProductImage);
-        add(jtfPris);
-        add(jComboBoxStorlekar);
-        add(jComboBoxColor);
-        add(jtfLagerStatus);
+        add(labelPris);
+        add(comboBoxStorlekar);
+        add(comboBoxColor);
+        add(labelLagerstatus);
         add(jtfMedelbetyg);
         buttonAddToCart.setPreferredSize(new Dimension(235,30));
         add(buttonAddToCart);
@@ -105,13 +234,13 @@ public class Store extends JPanel {
         add(scrollPane);
         revalidate();
 
-        jComboBoxStorlekar.addActionListener(e -> {
-            jComboBoxColor.removeAllItems();
+        comboBoxStorlekar.addActionListener(e -> {
+            comboBoxColor.removeAllItems();
             ArrayList temp = null;
             try {
-                temp = r1.getfärgFromDatabase(id1[0], Integer.parseInt((String) jComboBoxStorlekar.getSelectedItem()));
+                temp = r1.getfärgFromDatabase(id1[0], Integer.parseInt((String) comboBoxStorlekar.getSelectedItem()));
                 for (int i = 0; i < temp.size(); i++) {
-                    jComboBoxColor.addItem(temp.get(i));
+                    comboBoxColor.addItem(temp.get(i));
                 }
                 updateLagerstatus();
             } catch (NumberFormatException numberFormatException) {
@@ -119,7 +248,7 @@ public class Store extends JPanel {
             }
         });
 
-        jComboBoxColor.addActionListener(e-> {
+        comboBoxColor.addActionListener(e-> {
             try {
                 updateLagerstatus();
             } catch (NumberFormatException numberFormatException) {
@@ -128,8 +257,8 @@ public class Store extends JPanel {
         });
 
         buttonAddToCart.addActionListener(e -> {
-            r1.addToCart(id1[0], ActiveKund.getKund().getId(), Integer.parseInt(jComboBoxStorlekar.getSelectedItem().toString()), (String) jComboBoxColor.getSelectedItem());
-            jtfLagerStatus.setText("I lager: " + r1.getLagerstatusFromDatabase(id1[0], Integer.parseInt((String) jComboBoxStorlekar.getSelectedItem()), (String) r1.getfärgFromDatabase(id1[0], Integer.parseInt((String) jComboBoxStorlekar.getSelectedItem())).get(0)));
+            r1.addToCart(id1[0], ActiveKund.getKund().getId(), Integer.parseInt(comboBoxStorlekar.getSelectedItem().toString()), (String) comboBoxColor.getSelectedItem());
+            labelLagerstatus.setText("I lager: " + r1.getLagerstatusFromDatabase(id1[0], Integer.parseInt((String) comboBoxStorlekar.getSelectedItem()), (String) r1.getfärgFromDatabase(id1[0], Integer.parseInt((String) comboBoxStorlekar.getSelectedItem())).get(0)));
             buttonAddToCart.setEnabled(false);
             buttonAddToCart.setText("Vara tilllagd!");
         });
@@ -171,9 +300,9 @@ public class Store extends JPanel {
 
     private void updateLagerstatus() throws NumberFormatException{
         int skoId = r1.getSkomodellIDbyModell(activeButton.getText());
-        String color = (String) jComboBoxColor.getSelectedItem();
-        int lagerstatus = Integer.parseInt(r1.getLagerstatusFromDatabase(skoId, Integer.parseInt((String) jComboBoxStorlekar.getSelectedItem()), color));
-        jtfLagerStatus.setText("I lager: " + lagerstatus);
+        String color = (String) comboBoxColor.getSelectedItem();
+        int lagerstatus = Integer.parseInt(r1.getLagerstatusFromDatabase(skoId, Integer.parseInt((String) comboBoxStorlekar.getSelectedItem()), color));
+        labelLagerstatus.setText("I lager: " + lagerstatus);
         buttonAddToCart.setEnabled(lagerstatus > 0);
         buttonAddToCart.setText("Lägg i kundvagn!");
         this.revalidate();

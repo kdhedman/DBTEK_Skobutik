@@ -11,6 +11,10 @@ public class Färg {
 //        map.put(id, this);
     }
 
+    public String getFärg() {
+        return färg;
+    }
+
     @Override
     public String toString() {
         return "Färg{" +

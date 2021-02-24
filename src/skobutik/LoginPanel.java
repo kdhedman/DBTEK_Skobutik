@@ -26,19 +26,19 @@ public class LoginPanel extends JPanel  {
         addContent();
         setActionListeners();
         errorMessage.setForeground(Color.RED);
-
         userLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         passwordLabel.setHorizontalAlignment(SwingConstants.RIGHT);
     }
 
     private void setLocationAndSize(){
-        userLabel.setBounds(50,120,100,30);
-        usernameField.setBounds(180,120,220,30);
-        passwordLabel.setBounds(50,150,100,30);
-        passwordField.setBounds(180,150,220,30);
-        showPassword.setBounds(180,180,120,30);
-        login.setBounds(300,180,100,30);
-        errorMessage.setBounds(180,90,300,30);
+        int xIn = 180;
+        userLabel.setBounds(xIn,120,100,30);
+        usernameField.setBounds(xIn+130,120,220,30);
+        passwordLabel.setBounds(xIn,150,100,30);
+        passwordField.setBounds(xIn+130,150,220,30);
+        showPassword.setBounds(xIn+130,180,120,30);
+        login.setBounds(xIn+250,180,100,30);
+        errorMessage.setBounds(xIn+130,90,300,30);
     }
 
     private void addContent(){
