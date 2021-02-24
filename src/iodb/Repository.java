@@ -1,6 +1,7 @@
 package iodb;
 
 import dbObjects.Färg;
+import dbObjects.LagerStatus;
 import dbObjects.Skomodell;
 import dbObjects.Storlek;
 
@@ -34,9 +35,13 @@ public class Repository {
         List<Skomodell> shoes = repo.getSkomodellerAsOBjects();
         for (var shoe : shoes) {
             System.out.printf("Skomodell: %s id: %d Pris: %d\n", shoe.skomodell, shoe.id, shoe.pris);
-            System.out.println("Antal Storlekar: " + shoe.sizeColorMap.keySet().size());
-            for (Storlek size : shoe.sizeColorMap.keySet()) {
-                System.out.printf("Storlek: %d Färger %s\n", size.skostorlek, shoe.sizeColorMap.get(size).toString());
+            System.out.println("Antal Storlekar: " + shoe.sizeColorQuantityMap.keySet().size());
+            for (Storlek size : shoe.sizeColorQuantityMap.keySet()) {
+                System.out.printf("Storlek: %s ", size.toString());
+                for(Färg color : shoe.sizeColorQuantityMap.get(size).keySet()){
+                    System.out.printf("Färger: %s Lagerstatus: %s\n", color.toString(), shoe.sizeColorQuantityMap.get(size).get(color).toString());
+                }
+                System.out.println();
             }
             System.out.println("\n");
         }
@@ -387,23 +392,41 @@ public class Repository {
                 );
 
                 //add size to list
-                PreparedStatement stmtSizes = con.prepareStatement("select distinct StorlekId from lagermappning where SkomodellId = ?");
+                PreparedStatement stmtSizes = con.prepareStatement("select distinct StorlekId " +
+                        "from lagermappning " +
+                        "where SkomodellId = ?");
                 stmtSizes.setString(1, String.valueOf(skomodell.id));
                 ResultSet rsSize = stmtSizes.executeQuery();
 
                 while (rsSize.next()) {
                     int storlekID = rsSize.getInt("StorlekID");
-                    skomodell.sizeColorMap.put(sizeMap.get(storlekID), new ArrayList<>());
+                    skomodell.sizeColorQuantityMap.put(sizeMap.get(storlekID), new HashMap<>());
 
                     //add color to sizeColorMap
-                    PreparedStatement stmtColors = con.prepareStatement("select distinct färgid from lagermappning where SkomodellId = ? and StorlekId = ?");
+                    PreparedStatement stmtColors = con.prepareStatement("select distinct färgid " +
+                            "from lagermappning " +
+                            "where SkomodellId = ? and StorlekId = ?");
                     stmtColors.setString(1, String.valueOf(skomodell.id));
                     stmtColors.setString(2, String.valueOf(storlekID));
                     ResultSet rsColor = stmtColors.executeQuery();
 
                     while (rsColor.next()) {
                         int colorID = rsColor.getInt("FärgID");
-                        skomodell.sizeColorMap.get(sizeMap.get(storlekID)).add(colorMap.get(colorID));
+
+                        PreparedStatement stmtQuantity = con.prepareStatement("select id, Lagerstatus " +
+                                "from lagermappning " +
+                                "where SkomodellId = ? and StorlekId = ? and FärgId = ?");
+                        stmtQuantity.setString(1, String.valueOf(skomodell.id));
+                        stmtQuantity.setString(2, String.valueOf(storlekID));
+                        stmtQuantity.setString(3, String.valueOf(colorID));
+                        ResultSet rsQuantity = stmtQuantity.executeQuery();
+                        while(rsQuantity.next()){
+                            LagerStatus lagerStatus = new LagerStatus(rsQuantity.getInt("id"), rsQuantity.getInt("LagerStatus"));
+                            skomodell.sizeColorQuantityMap.get(sizeMap.get(storlekID)).put(colorMap.get(colorID), lagerStatus);
+                        }
+
+
+//                        skomodell.sizeColorQuantityMap.get(sizeMap.get(storlekID)).put(colorMap.get(colorID), );
                     }
                 }
 
@@ -412,7 +435,6 @@ public class Repository {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return result;
     }
 }

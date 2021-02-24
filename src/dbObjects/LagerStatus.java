@@ -8,4 +8,12 @@ public class LagerStatus {
         this.id = id;
         this.lagerstatus = lagerstatus;
     }
+
+    @Override
+    public String toString() {
+        return "LagerStatus{" +
+                "id=" + id +
+                ", lagerstatus=" + lagerstatus +
+                '}';
+    }
 }
