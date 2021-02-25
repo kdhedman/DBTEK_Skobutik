@@ -38,15 +38,16 @@ public class Cart extends JPanel {
 
     private void setLocationAndSize(){
         labelCartandName.setBounds(10,5,300,30);
-        labelTotalCost.setBounds(350,5,100,30);
+        labelTotalCost.setBounds(600,5,170,30);
         labelTotalCost.setHorizontalAlignment(SwingConstants.RIGHT);
-        buttonBackToStore.setBounds(370,420,100,30);
-        scrollPane.setBounds(0,50, 500,360);
+        buttonBackToStore.setBounds(5,453,775,100);
+        scrollPane.setBounds(5,50, 775,400);
     }
 
     private void addContent(){
         add(labelCartandName);
         add(labelTotalCost);
+        labelTotalCost.setHorizontalAlignment(SwingConstants.RIGHT);
         add(buttonBackToStore);
         add(scrollPane);
         scrollPane.setViewportView(jTable);
