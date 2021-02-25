@@ -281,54 +281,6 @@ VALUES (10, 6, 1),
        (11, 9, 6),
        (2, 9, 7);
 
--- create table FärgMappning(
--- 	id int not null auto_increment,
--- 	skomodellID int not null,
--- 	färgID int not null,
--- 	primary key(id),
--- 	foreign key(skomodellID) references skomodell(id) on delete cascade,
---     -- Här har vi cascade för om en tar bort en skomodell vill vi ta bort alla relaterade färgmappningar
--- 	foreign key(färgID) references färg(id)
--- );
---
--- insert into FärgMappning
--- 	(skomodellID, färgID)
--- 	values
--- 	(1,1), (1,2), (1,3),
--- 	(2,4), (2,5), (2,6),
--- 	(3,7), (3,1), (3,2),
--- 	(4,3), (4,4), (4,5),
--- 	(5,6), (5,7), (5,1),
--- 	(6,2), (6,3), (6,4),
--- 	(7,5), (7,6), (7,7),
--- 	(8,1), (8,2), (8,3),
--- 	(9,4), (9,5), (9,6),
--- 	(10,7), (10,1), (10,2);
---
--- create table StorleksMappning(
--- 	id int not null auto_increment,
--- 	skomodellID int not null,
--- 	storlekID int not null,
--- 	primary key(id),
--- 	foreign key(skomodellID) references skomodell(id) on delete cascade,
---     -- Här har vi cascade för om en tar bort en skomodell vill vi ta bort alla relaterade storleksmappningar
--- 	foreign key(storlekID) references storlek(id)
--- );
---
--- insert into StorleksMappning
--- 	(skomodellID, storlekID)
--- 	VALUES
--- 	(1,5), (1,6), (1,7),
--- 	(2,18), (2,19),
--- 	(3,14), (3,15), (3,16),
--- 	(4,6), (4,7), (4,8), (4,9),
--- 	(5,14), (5,15), (5,16),
--- 	(6,2), (6,6),
--- 	(7,5), (7,6),
--- 	(8,9), (8,11), (8,13),
--- 	(9,12), (9,13), (9,14),
--- 	(10,7), (10,11), (10,14), (10,16);
-
 create table KategoriMappning
 (
     id          int not null auto_increment,
@@ -403,25 +355,29 @@ VALUES (1, 'Det här är ju en tjejsko!!!', 8, 7),
 
 create table slutilager
 (
-    id          int not null auto_increment,
-    skomodellID int not null,
-    datum       timestamp default current_timestamp,
+    id              int not null auto_increment,
+    lagermappningID int not null default 1,
+    datum           timestamp    default current_timestamp,
     primary key (id),
-    foreign key (skomodellID) references skomodell (id)
+    foreign key (lagermappningID) references lagermappning (id)
 );
 
+-- Trigger
+
 delimiter //
-create trigger after_skomodell_update
+create trigger after_lagermappning_update
     after update
-    on skomodell
+    on lagermappning
     for each row
 begin
-    if new.lagerstatus < 1 then
-        insert into slutilager(skomodellID) VALUES (new.id);
+    if new.Lagerstatus < 1 then
+        insert into slutilager(lagermappningID) VALUES (new.id);
     end if;
 end//
 delimiter ;
+
 -- Stored Procedure
+
 delimiter //
 CREATE
     DEFINER = `skobutik`@`%` PROCEDURE `Stored_Procedure_Add_to_Cart`(Skomodell int, Kund int, StorlekIN int, FärgIN varchar(20))
@@ -490,39 +446,47 @@ BEGIN
             end if;
         end if;
     end if;
-END
+END//
+delimiter ;
 
-CREATE DEFINER=`skobutik`@`%` PROCEDURE `Stored_Procedure_Rate`(Grade int, comment1 varchar (150), customerIDIN int, skomodellIDIN int )
+delimiter //
+CREATE
+    DEFINER = `skobutik`@`%` PROCEDURE `Stored_Procedure_Rate`(Grade int, comment1 varchar(150), customerIDIN int,
+                                                               skomodellIDIN int)
 BEGIN
-declare variable_existingRating int;
-select id into variable_existingRating  from betyg where skomodellid = skomodellIDIN and kundid = customerIDIN;
-if variable_existingRating > 1 then delete from betyg where skomodellid = skomodellIDIN and kundid = customerIDIN;
-end if;
-insert into betyg (betygskalaid, kommentar, kundid,skomodellid) values
-((grade),(comment1),(customerIDIN),(skomodellIDIN));
+    declare variable_existingRating int;
+    select id into variable_existingRating from betyg where skomodellid = skomodellIDIN and kundid = customerIDIN;
+    if variable_existingRating > 1 then
+        delete from betyg where skomodellid = skomodellIDIN and kundid = customerIDIN;
+    end if;
+    insert into betyg (betygskalaid, kommentar, kundid, skomodellid)
+    values ((grade), (comment1), (customerIDIN), (skomodellIDIN));
 
-END
-delimiter;
+END//
+delimiter ;
+
 -- Function.
-CREATE DEFINER=`skobutik`@`%` FUNCTION `get_medelbetyg`(skomodellIN int) RETURNS float
+
+delimiter //
+CREATE
+    DEFINER = `skobutik`@`%` FUNCTION `get_medelbetyg`(skomodellIN int) RETURNS float
     READS SQL DATA
 BEGIN
 
-return (select avg(betygskalaid) as 'Medelbetyg' from betyg where skomodellID = skomodellIN);
-END
+    return (select avg(betygskalaid) as 'Medelbetyg' from betyg where skomodellID = skomodellIN);
+END//
+delimiter ;
 
 -- View
-CREATE
-ALGORITHM = UNDEFINED
-    DEFINER = `skobutik`@`%`
-    SQL SECURITY DEFINER
-VIEW `grade_view` AS
-SELECT
-    `skomodell`.`skomodell` AS `skomodell`,
-    `betygskala`.`betyg` AS  `Genomsnittligt omdömme`,
-    AVG(betyg.betygskalaID) AS `Genomsnittligt betyg`
-FROM
-    (skomodell
-        LEFT JOIN (betyg
-            JOIN betygskala ON ((betyg.betygskalaID = betygskala.id))) ON ((betyg.skomodellID = skomodell.id)))
-GROUP BY skomodell.skomodell
+
+delimiter //
+CREATE ALGORITHM = UNDEFINED DEFINER = `skobutik`@`%` SQL SECURITY DEFINER VIEW `grade_view` AS
+SELECT `skomodell`.`skomodell` AS `skomodell`,
+       `betygskala`.`betyg`    AS `Genomsnittligt omdömme`,
+       AVG(betyg.betygskalaID) AS `Genomsnittligt betyg`
+FROM (skomodell
+         LEFT JOIN (betyg
+    JOIN betygskala ON ((betyg.betygskalaID = betygskala.id))) ON ((betyg.skomodellID = skomodell.id)))
+GROUP BY skomodell.skomodell//
+
+delimiter ;
