@@ -52,21 +52,6 @@ public class Store extends JPanel {
         editComponents();
         updateGUI();
         addActionListeners();
-//        drawBackground();
-    }
-
-    public static void main(String[] args) {
-        Kund kund = new Kund(2, "Elin", null, null);
-        ActiveKund.setKund(kund);
-        JFrame frame = new JFrame();
-        frame.setTitle("Skobutik");
-        frame.setSize(800, 600);
-        frame.setResizable(false);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        Store store = new Store();
-        frame.add(store);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
     }
 
     private void setLocationAndSize() {
@@ -141,14 +126,6 @@ public class Store extends JPanel {
     }
 
     private void addShoeButtonActionListener(JButton button) {
-//        button.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mouseEntered(MouseEvent e) {
-//                super.mouseEntered(e);
-//                activeButton = button;
-//                updateGUI();
-//            }
-//        });
         button.addActionListener(l -> {
             activeButton = button;
             updateGUI();
@@ -219,14 +196,6 @@ public class Store extends JPanel {
     }
 
     private void addComboBoxStorlekarActionListener(){
-////        comboBoxStorlekar.addActionListener(l -> {
-//////            setActiveSize();
-////            updateComboBoxColors();
-////        });
-//        comboBoxStorlekar.addItemListener(l -> {
-////            setActiveSize();
-//            updateComboBoxColors(activeShoe.sizeColorQuantityMap.keySet().stream().filter(size -> size.skostorlek == comboBoxStorlekar.getSelectedIndex()).findFirst().get());
-//        });
         comboBoxStorlekar.addActionListener(e -> {
             comboBoxColor.removeAllItems();
             ArrayList temp = null;
@@ -252,9 +221,6 @@ public class Store extends JPanel {
                 //NOUP
             }
         });
-//        comboBoxColor.addActionListener(l -> {
-////            setActiveColor();
-//        });
     }
 
     private void updateGUI() {
@@ -277,14 +243,6 @@ public class Store extends JPanel {
         updateReviewTable();
     }
 
-    private void updateComboBoxSizes(){
-
-    }
-
-    private void updateComboBoxColors(Storlek storlek) {
-
-    }
-
     private void updateLabelLagerStatus() throws NumberFormatException{
         int skoId = r1.getSkomodellIDbyModell(activeButton.getText());
         String color = (String) comboBoxColor.getSelectedItem();
@@ -303,16 +261,6 @@ public class Store extends JPanel {
     }
 
 
-    private void updateLagerstatus() throws NumberFormatException{
-        int skoId = r1.getSkomodellIDbyModell(activeButton.getText());
-        String color = (String) comboBoxColor.getSelectedItem();
-        int lagerstatus = Integer.parseInt(r1.getLagerstatusFromDatabase(skoId, Integer.parseInt((String) comboBoxStorlekar.getSelectedItem()), color));
-        labelLagerstatus.setText("I lager: " + lagerstatus);
-        buttonAddToCart.setEnabled(lagerstatus > 0);
-        buttonAddToCart.setText("Lägg i kundvagn!");
-        this.revalidate();
-    }
-
     private void updateReviewTable() {
         JTable newTable;
         newTable = new JTable(r1.skomodellBetyg(activeButton.getText()), tableHeader);
@@ -325,128 +273,4 @@ public class Store extends JPanel {
 
         scrollPane.setViewportView(newTable);
     }
-
-    public void drawBackground() {
-        final int[] id1 = new int[1];
-        ArrayList<String> skor = r1.getskomodellFromDatabase();
-
-        for (int i = 1; i <= skor.size(); i++) {
-            JButton jb = new JButton(r1.getSkomodellFromDatabase(i));
-            int finalIndex = i;
-            jb.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                    super.mouseEntered(e);
-                    activeButton = jb;
-                    ImageIcon update = null;
-                    String sko1 = r1.getSkomodellFromDatabase(finalIndex);
-                    update = new ImageIcon("res/Pictures/" + sko1 + ".png");
-                    labelProductImage.setIcon(update);
-                    labelPris.setText("Pris: " + r1.getPrisFromDatabase(finalIndex));
-                    comboBoxStorlekar.removeAllItems();
-                    ArrayList temp = r1.getStorlekarFromDatabase(finalIndex);
-                    for (int i = 0; i < temp.size(); i++) {
-                        comboBoxStorlekar.addItem(temp.get(i));
-                    }
-                    comboBoxColor.removeAllItems();
-                    ArrayList temp2 = r1.getfärgFromDatabase(finalIndex, Integer.parseInt((String) comboBoxStorlekar.getSelectedItem()));
-                    for (int i = 0; i < temp2.size(); i++) {
-                        comboBoxColor.addItem(temp2.get(i));
-                    }
-                    updateLagerstatus();
-                    updateMedelbetyg();
-                    updateReviewTable();
-
-                    id1[0] = finalIndex;
-
-                }
-            });
-            add(jb);
-            activeButton = jb;
-        }
-        add(labelLagerstatus);
-        add(jtfMedelbetyg);
-        buttonAddToCart.setPreferredSize(new Dimension(235, 30));
-        add(buttonAddToCart);
-        buttonShowCart.setPreferredSize(new Dimension(235, 30));
-        add(buttonShowCart);
-        add(labelBetyg);
-        rating.setPreferredSize(new Dimension(25, 30));
-        rating.setText("1-4");
-        add(rating);
-        add(labelComment);
-        comment.setPreferredSize(new Dimension(220, 30));
-        add(comment);
-        add(buttonRate);
-
-        updateReviewTable();
-        scrollPane.setVerticalScrollBar(new JScrollBar());
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        add(scrollPane);
-        revalidate();
-
-        comboBoxStorlekar.addActionListener(e -> {
-            comboBoxColor.removeAllItems();
-            ArrayList temp = null;
-            try {
-                temp = r1.getfärgFromDatabase(id1[0], Integer.parseInt((String) comboBoxStorlekar.getSelectedItem()));
-                for (int i = 0; i < temp.size(); i++) {
-                    comboBoxColor.addItem(temp.get(i));
-                }
-//                updateLabelLagerStatus();
-            } catch (NumberFormatException numberFormatException) {
-                //Let's ignore this
-            }
-        });
-
-        comboBoxColor.addActionListener(e -> {
-            try {
-//                updateLabelLagerStatus();
-            } catch (NumberFormatException numberFormatException) {
-                //NOUP
-            }
-        });
-
-        buttonAddToCart.addActionListener(e -> {
-            r1.addToCart(id1[0], ActiveKund.getKund().getId(), Integer.parseInt(comboBoxStorlekar.getSelectedItem().toString()), (String) comboBoxColor.getSelectedItem());
-            labelLagerstatus.setText("I lager: " + r1.getLagerstatusFromDatabase(id1[0], Integer.parseInt((String) comboBoxStorlekar.getSelectedItem()), (String) r1.getfärgFromDatabase(id1[0], Integer.parseInt((String) comboBoxStorlekar.getSelectedItem())).get(0)));
-            buttonAddToCart.setEnabled(false);
-            buttonAddToCart.setText("Vara tilllagd!");
-        });
-
-        buttonShowCart.addActionListener(e -> {
-            MainFrame mf = MainFrame.getInstance();
-            Cart cart = new Cart();
-            mf.changeView(cart);
-        });
-
-        buttonRate.addActionListener(e -> {
-            String name = ActiveKund.getKund().getNamn();
-            int kundId = r1.getKundIDFromNamn(name);
-            int skomodellID = r1.getSkomodellIDbyModell(activeButton.getText());
-            int ratingInt = 0;
-            try {
-                ratingInt = Integer.parseInt(rating.getText());
-            } catch (NumberFormatException nfe) {
-                rating.setText("1-4");
-                return;
-            }
-            if (ratingInt <= 0 || ratingInt > 4) {
-                rating.setText("1-4");
-                return;
-            }
-
-            if (comment.getText().length() > 50) {
-                comment.setText("Kommentar: (max 50 tecken)");
-                return;
-            }
-            r1.setRating(ratingInt, comment.getText(), kundId, skomodellID);
-            updateReviewTable();
-            rating.setText("1-4");
-            comment.setText("Kommentar");
-        });
-
-
-    }
-
 }

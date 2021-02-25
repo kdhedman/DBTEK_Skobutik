@@ -30,23 +30,6 @@ public class Repository {
         }
     }
 
-    public static void main(String[] args) {
-        Repository repo = new Repository();
-        List<Skomodell> shoes = repo.getSkomodellerAsOBjects();
-        for (var shoe : shoes) {
-            System.out.printf("Skomodell: %s id: %d Pris: %d\n", shoe.skomodell, shoe.id, shoe.pris);
-            System.out.println("Antal Storlekar: " + shoe.sizeColorQuantityMap.keySet().size());
-            for (Storlek size : shoe.sizeColorQuantityMap.keySet()) {
-                System.out.printf("Storlek: %s ", size.toString());
-                for(Färg color : shoe.sizeColorQuantityMap.get(size).keySet()){
-                    System.out.printf("Färger: %s Lagerstatus: %s\n", color.toString(), shoe.sizeColorQuantityMap.get(size).get(color).toString());
-                }
-                System.out.println();
-            }
-            System.out.println("\n");
-        }
-    }
-
     private boolean testingDBConnection() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
