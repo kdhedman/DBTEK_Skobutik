@@ -17,9 +17,6 @@ public class Store extends JPanel {
     JButton activeButton;
     Skomodell activeShoe;
 
-    BlockingQueue<Object> hate = new LinkedBlockingQueue<>();
-
-
     JLabel labelWelcome = new JLabel("Välkommen, " + ActiveKund.getKund().getNamn() + "!");
     JPanel shoeContainer = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 4));
     JScrollPane scrollPaneShoes = new JScrollPane(shoeContainer, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -31,7 +28,7 @@ public class Store extends JPanel {
     JLabel labelStorlek = new JLabel("Storlek:");
     JLabel labelColor = new JLabel("Färg:");
     JLabel labelLagerstatus = new JLabel("I lager: ");
-    JFormattedTextField jtfMedelbetyg = new JFormattedTextField();
+    JLabel labelMedelbetyg = new JLabel();
     JComboBox comboBoxStorlekar = new JComboBox();
     JComboBox comboBoxColor = new JComboBox();
     JButton buttonAddToCart = new JButton("Lägg i kundvagn");
@@ -52,6 +49,7 @@ public class Store extends JPanel {
         editComponents();
         updateGUI();
         addActionListeners();
+        updateLabelLagerStatus();
     }
 
     private void setLocationAndSize() {
@@ -75,6 +73,7 @@ public class Store extends JPanel {
         labelCommentCounter.setBounds(659, 325, 20, 30);
         buttonAddToCart.setBounds(405, 150, 370, 60);
         buttonShowCart.setBounds(405, 220, 370, 60);
+        labelMedelbetyg.setBounds(230, 270, 130, 30);
     }
 
     private void editComponents() {
@@ -113,6 +112,7 @@ public class Store extends JPanel {
         add(labelCommentCounter);
         add(buttonAddToCart);
         add(buttonShowCart);
+        add(labelMedelbetyg);
     }
 
     private void addShoeButtons(JPanel container) {
@@ -256,8 +256,8 @@ public class Store extends JPanel {
     private void updateMedelbetyg() {
         int skoId = r1.getSkomodellIDbyModell(activeButton.getText());
         float medelbetyg = r1.getSkomodellAverageBetyg(skoId);
-        jtfMedelbetyg.setText(String.format("Medel betyg: %1.1f", medelbetyg));
-        if (medelbetyg == 0) jtfMedelbetyg.setText("Ej betygsatt.");
+        labelMedelbetyg.setText(String.format("Medelbetyg: %1.1f", medelbetyg));
+        if (medelbetyg == 0) labelMedelbetyg.setText("Ej betygsatt.");
     }
 
 
