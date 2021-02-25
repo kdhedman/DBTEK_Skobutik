@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Skomodell {
-//    public static Map<Integer, Skomodell> map = new HashMap<>();
+    public static Map<Integer, Skomodell> map = new HashMap<>();
     public int id;
     public String skomodell;
     public int pris;
@@ -19,10 +19,15 @@ public class Skomodell {
         this.skomodell = skomodell;
         this.pris = pris;
         this.märke = märke;
-//        map.put(id, this);
+        map.put(id, this);
     }
 
     public String getSkomodell() {
+        return skomodell;
+    }
+
+    @Override
+    public String toString() {
         return skomodell;
     }
 }

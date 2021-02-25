@@ -9,6 +9,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 public class Store extends JPanel {
@@ -16,10 +17,12 @@ public class Store extends JPanel {
     List<Skomodell> shoes = r1.getSkomodellerAsOBjects();
     JButton activeButton;
     Skomodell activeShoe;
+    Storlek activeSize;
+    Färg activeColor;
 
 
     JLabel labelWelcome = new JLabel("Välkommen, " + ActiveKund.getKund().getNamn() + "!");
-    JPanel shoeContainer = new JPanel(new FlowLayout(FlowLayout.CENTER,4,4));
+    JPanel shoeContainer = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 4));
     JScrollPane scrollPaneShoes = new JScrollPane(shoeContainer, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
     ImageIcon imageIconShoe = new ImageIcon("res/Pictures/placeholder.jpg");
@@ -72,18 +75,18 @@ public class Store extends JPanel {
     private void setLocationAndSize() {
         labelWelcome.setBounds(0, 0, 800, 30);
         //Maybe add categories here.
-        scrollPaneShoes.setBounds(5, 30, 775,76);
-        labelProductImage.setBounds(20,110,200,200);
+        scrollPaneShoes.setBounds(5, 30, 775, 76);
+        labelProductImage.setBounds(20, 110, 200, 200);
         labelProduct.setBounds(220, 130, 200, 30);
-        labelPris.setBounds(220,150,100,40);
-        labelStorlek.setBounds(220, 170, 60, 40);
+        labelPris.setBounds(220, 150, 100, 40);
+        labelStorlek.setBounds(220, 170, 70, 40);
         comboBoxStorlekar.setBounds(220, 205, 60, 40);
-        labelColor.setBounds(290, 170, 60,40);
+        labelColor.setBounds(290, 170, 60, 40);
         comboBoxColor.setBounds(290, 205, 60, 40);
         labelLagerstatus.setBounds(220, 240, 100, 30);
     }
 
-    private void editComponents(){
+    private void editComponents() {
         Font font = labelProduct.getFont();
         labelWelcome.setHorizontalAlignment(SwingConstants.CENTER);
         labelProduct.setHorizontalAlignment(SwingConstants.LEFT);
@@ -93,7 +96,7 @@ public class Store extends JPanel {
         labelProduct.setFont(new Font(font.getName(), Font.PLAIN, 20));
     }
 
-    private void addComponents(){
+    private void addComponents() {
         add(labelWelcome);
         addShoeButtons(shoeContainer);
         add(scrollPaneShoes);
@@ -107,83 +110,79 @@ public class Store extends JPanel {
         add(labelLagerstatus);
     }
 
-    private void addShoeButtons(JPanel container){
+    private void addShoeButtons(JPanel container) {
         shoes.stream().forEach(shoe -> {
-
             JButton button = new JButton(shoe.skomodell);
             activeButton = button;
-            int width = button.getWidth();
             button.setPreferredSize(new Dimension(110, 50));
             addShoeButtonActionListener(button);
             container.add(button);
         });
     }
 
-    private void addShoeButtonActionListener(JButton button){
-        button.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                super.mouseEntered(e);
-                activeButton = button;
-                updateGUI();
-            }
+    private void addShoeButtonActionListener(JButton button) {
+//        button.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseEntered(MouseEvent e) {
+//                super.mouseEntered(e);
+//                activeButton = button;
+//                updateGUI();
+//            }
+//        });
+        button.addActionListener(l -> {
+            activeButton = button;
+            updateGUI();
         });
     }
 
-    private void addActionListeners(){
+    private void addActionListeners() {
         comboBoxStorlekar.addActionListener(l -> {
-            try {
-                updateComboBoxColors();
-            } catch (NullPointerException e) {
-                //I Don't care!
-            }
+
         });
 
         comboBoxColor.addActionListener(l -> {
-            updateLabelLagerStatus();
+
         });
     }
 
-    private void updateGUI() throws InterruptedException {
-        activeShoe = shoes.stream().filter(shoe -> shoe.getSkomodell().equals(activeButton.getText())).findFirst().get();
-
-        labelProductImage.setIcon(new ImageIcon("res/Pictures/" + activeShoe.getSkomodell() + ".png"));
-        labelProduct.setText(activeShoe.getSkomodell());
-        labelPris.setText(String.format("%s valuta", String.valueOf(activeShoe.pris)));
-
-
-        comboBoxStorlekar.removeAllItems();
-        List<Integer> sizes = activeShoe.sizeColorQuantityMap.keySet().stream().map(Storlek::getSkostorlek).collect(Collectors.toList());
-        Collections.sort(sizes);
-        sizes.stream().forEach(size -> comboBoxStorlekar.addItem(size));
-        try {
-            updateComboBoxColors();
-        } catch (NullPointerException e) {
-            //I DONT CARE!
-        }
+    private void setActiveSize(){
+        activeSize = activeShoe.sizeColorQuantityMap.keySet().stream().filter(shoe ->
+            shoe == comboBoxStorlekar.getSelectedItem()).findFirst().get();
     }
 
-    private void updateComboBoxColors() throws NullPointerException{
-        comboBoxColor.removeAllItems();
-        List<String> colors = activeShoe.sizeColorQuantityMap.get(
-                activeShoe.sizeColorQuantityMap.keySet().
-                        stream().filter(size -> size.getSkostorlek() == (int)comboBoxStorlekar.getSelectedItem()).findFirst().get()).
-                keySet().stream().map(Färg::getFärg).collect(Collectors.toList());
-        Collections.sort(colors);
-        colors.stream().forEach(color -> comboBoxColor.addItem(color));
+    private void setActiveColor(){
+
     }
 
-    private void updateLabelLagerStatus(){
-
-        Storlek storlek = activeShoe.sizeColorQuantityMap.keySet().stream().filter(
-                size -> size.getSkostorlek() == (int)comboBoxStorlekar.getSelectedItem()).findFirst().get();
-        System.out.println(storlek.toString());
-        Färg color = activeShoe.sizeColorQuantityMap.get(storlek).keySet().stream().filter(
-                c -> c.färg.equals(comboBoxColor.getSelectedItem())).findFirst().get();
-        int lagerstatus = activeShoe.sizeColorQuantityMap.get(storlek).get(color).lagerstatus;
+    private void updateGUI() {
+        activeShoe = shoes.stream().filter(shoe -> shoe.skomodell.equals(activeButton.getText())).findFirst().get();
+        labelProductImage.setIcon(new ImageIcon(String.format("res/Pictures/%s.png", activeShoe.skomodell)));
+        labelProduct.setText(activeShoe.skomodell);
+        labelPris.setText(String.format("%d valuta", activeShoe.pris));
+        updateComboBoxSizes();
     }
 
-    private void updateLagerStatus(){
+    private void updateComboBoxSizes(){
+        comboBoxStorlekar.removeAll();
+        activeShoe.sizeColorQuantityMap.keySet().stream().forEach(shoe ->{
+            comboBoxStorlekar.addItem(shoe);
+        });
+        comboBoxStorlekar.setSelectedItem(
+                activeShoe.sizeColorQuantityMap.keySet().stream().findFirst().get()
+        );
+        revalidate();
+        setActiveSize();
+    }
+
+    private void updateComboBoxColors() {
+
+    }
+
+    private void updateLabelLagerStatus() {
+
+    }
+
+    private void updateLagerStatus() {
         //        int lagerstatus = Integer.parseInt(r1.getLagerstatusFromDatabase(skoId, Integer.parseInt((String) comboBoxStorlekar.getSelectedItem()), color));
     }
 
@@ -231,16 +230,16 @@ public class Store extends JPanel {
         add(comboBoxColor);
         add(labelLagerstatus);
         add(jtfMedelbetyg);
-        buttonAddToCart.setPreferredSize(new Dimension(235,30));
+        buttonAddToCart.setPreferredSize(new Dimension(235, 30));
         add(buttonAddToCart);
-        buttonShowCart.setPreferredSize(new Dimension(235,30));
+        buttonShowCart.setPreferredSize(new Dimension(235, 30));
         add(buttonShowCart);
         add(labelBetyg);
-        rating.setPreferredSize(new Dimension(25,30));
+        rating.setPreferredSize(new Dimension(25, 30));
         rating.setText("1-4");
         add(rating);
         add(labelComment);
-        comment.setPreferredSize(new Dimension(220,30));
+        comment.setPreferredSize(new Dimension(220, 30));
         add(comment);
         add(buttonRate);
 
@@ -264,7 +263,7 @@ public class Store extends JPanel {
             }
         });
 
-        comboBoxColor.addActionListener(e-> {
+        comboBoxColor.addActionListener(e -> {
             try {
 //                updateLabelLagerStatus();
             } catch (NumberFormatException numberFormatException) {
@@ -285,23 +284,23 @@ public class Store extends JPanel {
             mf.changeView(cart);
         });
 
-        buttonRate.addActionListener(e->{
+        buttonRate.addActionListener(e -> {
             String name = ActiveKund.getKund().getNamn();
             int kundId = r1.getKundIDFromNamn(name);
             int skomodellID = r1.getSkomodellIDbyModell(activeButton.getText());
             int ratingInt = 0;
-            try{
+            try {
                 ratingInt = Integer.parseInt(rating.getText());
-            } catch (NumberFormatException nfe){
+            } catch (NumberFormatException nfe) {
                 rating.setText("1-4");
                 return;
             }
-            if(ratingInt <= 0 || ratingInt > 4){
+            if (ratingInt <= 0 || ratingInt > 4) {
                 rating.setText("1-4");
                 return;
             }
 
-            if(comment.getText().length() > 50){
+            if (comment.getText().length() > 50) {
                 comment.setText("Kommentar: (max 50 tecken)");
                 return;
             }
@@ -314,10 +313,10 @@ public class Store extends JPanel {
         updateMedelbetyg();
     }
 
-    private void updateMedelbetyg(){
+    private void updateMedelbetyg() {
         int skoId = r1.getSkomodellIDbyModell(activeButton.getText());
-        float medelbetyg  = r1.getSkomodellAverageBetyg(skoId);
-        jtfMedelbetyg.setText(String.format("Medel betyg: %1.1f",medelbetyg));
+        float medelbetyg = r1.getSkomodellAverageBetyg(skoId);
+        jtfMedelbetyg.setText(String.format("Medel betyg: %1.1f", medelbetyg));
         if (medelbetyg == 0) jtfMedelbetyg.setText("Ej betygsatt.");
     }
 
