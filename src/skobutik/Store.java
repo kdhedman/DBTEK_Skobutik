@@ -7,18 +7,22 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 public class Store extends JPanel {
     Repository r1 = new Repository();
     List<Skomodell> shoes = r1.getSkomodellerAsOBjects();
     JButton activeButton;
+    List<Färg> allColors = new ArrayList<>();
+    List<Storlek> allSizes = new ArrayList<>();
     Skomodell activeShoe;
     Storlek activeSize;
     Färg activeColor;
+
+    BlockingQueue<Object> hate = new LinkedBlockingQueue<>();
 
 
     JLabel labelWelcome = new JLabel("Välkommen, " + ActiveKund.getKund().getNamn() + "!");
@@ -29,8 +33,8 @@ public class Store extends JPanel {
     JLabel labelProductImage = new JLabel(imageIconShoe);
     JLabel labelProduct = new JLabel("SkomodellSkomodell");
     JLabel labelPris = new JLabel("Pris: Woowee!");
-    JLabel labelColor = new JLabel("Färg       ");
-    JLabel labelStorlek = new JLabel("Storlek     ");
+    JLabel labelStorlek = new JLabel("Storlek:");
+    JLabel labelColor = new JLabel("Färg:");
     JLabel labelLagerstatus = new JLabel("I lager: ");
 
     JFormattedTextField jtfMedelbetyg = new JFormattedTextField();
@@ -49,6 +53,13 @@ public class Store extends JPanel {
     JButton buttonRate = new JButton("Åsikta dig!");
 
     public Store() {
+        shoes.stream().distinct().forEach(shoe -> {
+            List<Storlek> sizes = shoe.sizeColorQuantityMap.keySet().stream().distinct().collect(Collectors.toList());
+            for (Storlek size : sizes) {
+                if (!allSizes.contains(size)) allSizes.add(size);
+            }
+        });
+        System.out.println(allSizes.toString());
         setLayout(null);  // Testar annan layoutform
         setLocationAndSize(); //Det här ingår där också, kommentera bort för gamla design.
         addComponents();
@@ -79,21 +90,31 @@ public class Store extends JPanel {
         labelProductImage.setBounds(20, 110, 200, 200);
         labelProduct.setBounds(220, 130, 200, 30);
         labelPris.setBounds(220, 150, 100, 40);
-        labelStorlek.setBounds(220, 170, 70, 40);
-        comboBoxStorlekar.setBounds(220, 205, 60, 40);
-        labelColor.setBounds(290, 170, 60, 40);
-        comboBoxColor.setBounds(290, 205, 60, 40);
-        labelLagerstatus.setBounds(220, 240, 100, 30);
+        labelStorlek.setBounds(220, 170, 50, 40);
+        comboBoxStorlekar.setBounds(220, 200, 60, 40);
+        labelColor.setBounds(280, 170, 50, 40);
+        comboBoxColor.setBounds(290, 200, 60, 40);
+        labelLagerstatus.setBounds(232, 240, 50, 30);
+        scrollPane.setBounds(5, 330, 500, 200);
     }
+
+
+//    scrollPane.setVerticalScrollBar(new JScrollBar());
+//        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+//    add(scrollPane);
 
     private void editComponents() {
         Font font = labelProduct.getFont();
         labelWelcome.setHorizontalAlignment(SwingConstants.CENTER);
         labelProduct.setHorizontalAlignment(SwingConstants.LEFT);
-        labelColor.setHorizontalAlignment(SwingConstants.CENTER);
-        labelStorlek.setHorizontalAlignment(SwingConstants.CENTER);
+        labelColor.setHorizontalAlignment(SwingConstants.RIGHT);
+        labelStorlek.setHorizontalAlignment(SwingConstants.RIGHT);
+        labelLagerstatus.setHorizontalAlignment(SwingConstants.LEFT);
 
         labelProduct.setFont(new Font(font.getName(), Font.PLAIN, 20));
+
+        scrollPane.setVerticalScrollBar(new JScrollBar());
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     }
 
     private void addComponents() {
@@ -108,16 +129,24 @@ public class Store extends JPanel {
         add(labelStorlek);
         add(comboBoxStorlekar);
         add(labelLagerstatus);
+        updateMedelbetyg();
+        updateReviewTable();
+        add(scrollPane);
     }
 
     private void addShoeButtons(JPanel container) {
         shoes.stream().forEach(shoe -> {
-            JButton button = new JButton(shoe.skomodell);
+            JButton button = new JButton(shoe.toString());
             activeButton = button;
             button.setPreferredSize(new Dimension(110, 50));
             addShoeButtonActionListener(button);
             container.add(button);
         });
+    }
+
+    private void addSizeButtons(){
+        JPanel sizeContainer = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+
     }
 
     private void addShoeButtonActionListener(JButton button) {
@@ -135,55 +164,156 @@ public class Store extends JPanel {
         });
     }
 
+
     private void addActionListeners() {
-        comboBoxStorlekar.addActionListener(l -> {
+        addComboBoxStorlekarActionListener();
+        addComboBoxColorActionListener();
 
+        buttonAddToCart.addActionListener(e -> {
+            r1.addToCart(activeShoe.id, ActiveKund.getKund().getId(), Integer.parseInt(comboBoxStorlekar.getSelectedItem().toString()), (String) comboBoxColor.getSelectedItem());
+            labelLagerstatus.setText("I lager: " + r1.getLagerstatusFromDatabase(
+                    activeShoe.id,
+                    Integer.parseInt((String) comboBoxStorlekar.getSelectedItem()),
+                    (String) r1.getfärgFromDatabase(activeShoe.id, Integer.parseInt((String) comboBoxStorlekar.getSelectedItem())).get(0)));
+            buttonAddToCart.setEnabled(false);
+            buttonAddToCart.setText("Vara tilllagd!");
         });
 
-        comboBoxColor.addActionListener(l -> {
+        buttonShowCart.addActionListener(e -> {
+            MainFrame mf = MainFrame.getInstance();
+            Cart cart = new Cart();
+            mf.changeView(cart);
+        });
 
+        buttonRate.addActionListener(e -> {
+            String name = ActiveKund.getKund().getNamn();
+            int kundId = r1.getKundIDFromNamn(name);
+            int skomodellID = r1.getSkomodellIDbyModell(activeButton.getText());
+            int ratingInt = 0;
+            try {
+                ratingInt = Integer.parseInt(rating.getText());
+            } catch (NumberFormatException nfe) {
+                rating.setText("1-4");
+                return;
+            }
+            if (ratingInt <= 0 || ratingInt > 4) {
+                rating.setText("1-4");
+                return;
+            }
+
+            if (comment.getText().length() > 50) {
+                comment.setText("Kommentar: (max 50 tecken)");
+                return;
+            }
+            r1.setRating(ratingInt, comment.getText(), kundId, skomodellID);
+            updateReviewTable();
+            rating.setText("1-4");
+            comment.setText("Kommentar");
         });
     }
 
-    private void setActiveSize(){
-        activeSize = activeShoe.sizeColorQuantityMap.keySet().stream().filter(shoe ->
-            shoe == comboBoxStorlekar.getSelectedItem()).findFirst().get();
+    private void addComboBoxStorlekarActionListener(){
+////        comboBoxStorlekar.addActionListener(l -> {
+//////            setActiveSize();
+////            updateComboBoxColors();
+////        });
+//        comboBoxStorlekar.addItemListener(l -> {
+////            setActiveSize();
+//            updateComboBoxColors(activeShoe.sizeColorQuantityMap.keySet().stream().filter(size -> size.skostorlek == comboBoxStorlekar.getSelectedIndex()).findFirst().get());
+//        });
+        comboBoxStorlekar.addActionListener(e -> {
+            comboBoxColor.removeAllItems();
+            ArrayList temp = null;
+            try {
+                temp = r1.getfärgFromDatabase(activeShoe.id, Integer.parseInt((String) comboBoxStorlekar.getSelectedItem()));
+                for (int i = 0; i < temp.size(); i++) {
+                    comboBoxColor.addItem(temp.get(i));
+                }
+                updateLabelLagerStatus();
+            } catch (NumberFormatException numberFormatException) {
+                //Let's ignore this
+            }
+        });
+
     }
 
-    private void setActiveColor(){
+    private void addComboBoxColorActionListener(){
 
+        comboBoxColor.addActionListener(e -> {
+            try {
+                updateLabelLagerStatus();
+            } catch (NumberFormatException numberFormatException) {
+                //NOUP
+            }
+        });
+//        comboBoxColor.addActionListener(l -> {
+////            setActiveColor();
+//        });
     }
 
     private void updateGUI() {
-        activeShoe = shoes.stream().filter(shoe -> shoe.skomodell.equals(activeButton.getText())).findFirst().get();
+        activeShoe = shoes.stream().filter(shoe -> shoe.toString().equals(activeButton.getText())).findFirst().get();
+        System.out.println("in UpdateGUI B" + activeShoe);
         labelProductImage.setIcon(new ImageIcon(String.format("res/Pictures/%s.png", activeShoe.skomodell)));
         labelProduct.setText(activeShoe.skomodell);
         labelPris.setText(String.format("%d valuta", activeShoe.pris));
-        updateComboBoxSizes();
+        System.out.println("in updateGUI E");
+
+        comboBoxStorlekar.removeAllItems();
+        ArrayList temp = r1.getStorlekarFromDatabase(activeShoe.id);
+        for (int i = 0; i < temp.size(); i++) {
+            comboBoxStorlekar.addItem(temp.get(i));
+        }
+        comboBoxColor.removeAllItems();
+        ArrayList temp2 = r1.getfärgFromDatabase(activeShoe.id, Integer.parseInt((String) comboBoxStorlekar.getSelectedItem()));
+        for (int i = 0; i < temp2.size(); i++) {
+            comboBoxColor.addItem(temp2.get(i));
+        }
+
+        updateReviewTable();
     }
 
     private void updateComboBoxSizes(){
-        comboBoxStorlekar.removeAll();
-        activeShoe.sizeColorQuantityMap.keySet().stream().forEach(shoe ->{
-            comboBoxStorlekar.addItem(shoe);
-        });
-        comboBoxStorlekar.setSelectedItem(
-                activeShoe.sizeColorQuantityMap.keySet().stream().findFirst().get()
-        );
-        revalidate();
-        setActiveSize();
-    }
-
-    private void updateComboBoxColors() {
 
     }
 
-    private void updateLabelLagerStatus() {
+    private void updateComboBoxColors(Storlek storlek) {
 
     }
 
-    private void updateLagerStatus() {
-        //        int lagerstatus = Integer.parseInt(r1.getLagerstatusFromDatabase(skoId, Integer.parseInt((String) comboBoxStorlekar.getSelectedItem()), color));
+//    private void updateLabelLagerStatus() {
+//
+//    }
+
+    private void updateMedelbetyg() {
+        int skoId = r1.getSkomodellIDbyModell(activeButton.getText());
+        float medelbetyg = r1.getSkomodellAverageBetyg(skoId);
+        jtfMedelbetyg.setText(String.format("Medel betyg: %1.1f", medelbetyg));
+        if (medelbetyg == 0) jtfMedelbetyg.setText("Ej betygsatt.");
+    }
+
+
+    private void updateLagerstatus() throws NumberFormatException{
+        int skoId = r1.getSkomodellIDbyModell(activeButton.getText());
+        String color = (String) comboBoxColor.getSelectedItem();
+        int lagerstatus = Integer.parseInt(r1.getLagerstatusFromDatabase(skoId, Integer.parseInt((String) comboBoxStorlekar.getSelectedItem()), color));
+        labelLagerstatus.setText("I lager: " + lagerstatus);
+        buttonAddToCart.setEnabled(lagerstatus > 0);
+        buttonAddToCart.setText("Lägg i kundvagn!");
+        this.revalidate();
+    }
+
+    private void updateReviewTable() {
+        JTable newTable;
+        newTable = new JTable(r1.skomodellBetyg(activeButton.getText()), tableHeader);
+
+        newTable.setDragEnabled(false);
+        newTable.getColumnModel().getColumn(0).setMaxWidth(100);
+        newTable.getColumnModel().getColumn(1).setMaxWidth(100);
+        newTable.getColumnModel().getColumn(2).setMinWidth(332);
+        newTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        scrollPane.setViewportView(newTable);
     }
 
     public void drawBackground() {
@@ -213,7 +343,7 @@ public class Store extends JPanel {
                     for (int i = 0; i < temp2.size(); i++) {
                         comboBoxColor.addItem(temp2.get(i));
                     }
-//                    updateLagerstatus();
+                    updateLagerstatus();
                     updateMedelbetyg();
                     updateReviewTable();
 
@@ -224,10 +354,6 @@ public class Store extends JPanel {
             add(jb);
             activeButton = jb;
         }
-        add(labelProductImage);
-        add(labelPris);
-        add(comboBoxStorlekar);
-        add(comboBoxColor);
         add(labelLagerstatus);
         add(jtfMedelbetyg);
         buttonAddToCart.setPreferredSize(new Dimension(235, 30));
@@ -310,38 +436,7 @@ public class Store extends JPanel {
             comment.setText("Kommentar");
         });
 
-        updateMedelbetyg();
-    }
 
-    private void updateMedelbetyg() {
-        int skoId = r1.getSkomodellIDbyModell(activeButton.getText());
-        float medelbetyg = r1.getSkomodellAverageBetyg(skoId);
-        jtfMedelbetyg.setText(String.format("Medel betyg: %1.1f", medelbetyg));
-        if (medelbetyg == 0) jtfMedelbetyg.setText("Ej betygsatt.");
-    }
-
-
-//    private void updateLagerstatus() throws NumberFormatException{
-//        int skoId = r1.getSkomodellIDbyModell(activeButton.getText());
-//        String color = (String) comboBoxColor.getSelectedItem();
-//        int lagerstatus = Integer.parseInt(r1.getLagerstatusFromDatabase(skoId, Integer.parseInt((String) comboBoxStorlekar.getSelectedItem()), color));
-//        labelLagerstatus.setText("I lager: " + lagerstatus);
-//        buttonAddToCart.setEnabled(lagerstatus > 0);
-//        buttonAddToCart.setText("Lägg i kundvagn!");
-//        this.revalidate();
-//    }
-
-    private void updateReviewTable() {
-        JTable newTable;
-        newTable = new JTable(r1.skomodellBetyg(activeButton.getText()), tableHeader);
-
-        newTable.setDragEnabled(false);
-        newTable.getColumnModel().getColumn(0).setMaxWidth(100);
-        newTable.getColumnModel().getColumn(1).setMaxWidth(100);
-        newTable.getColumnModel().getColumn(2).setMinWidth(300);
-        newTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
-        scrollPane.setViewportView(newTable);
     }
 
 }

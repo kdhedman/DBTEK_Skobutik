@@ -3,7 +3,7 @@ package dbObjects;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Storlek {
+public class Storlek implements Comparable<Storlek>{
     public static Map<Integer, Storlek> map = new HashMap<>();
     public int id;
     public int skostorlek;
@@ -21,5 +21,11 @@ public class Storlek {
     @Override
     public String toString() {
         return String.valueOf(skostorlek);
+    }
+
+
+    @Override
+    public int compareTo(Storlek o) {
+        return o.skostorlek < this.skostorlek ? 1 : o.skostorlek == this.skostorlek ? 0 : -1;
     }
 }

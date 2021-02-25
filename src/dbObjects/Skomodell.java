@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Skomodell {
     public static Map<Integer, Skomodell> map = new HashMap<>();
@@ -29,5 +30,20 @@ public class Skomodell {
     @Override
     public String toString() {
         return skomodell;
+    }
+
+    public List<Storlek> getAllStorlek(){
+        return sizeColorQuantityMap.keySet().stream().collect(Collectors.toList());
+    }
+
+    public List<Färg> getAllFärg(){
+        List<Färg> colors = new ArrayList<>();
+        List<Storlek> storleker = getAllStorlek();
+        sizeColorQuantityMap.keySet().stream().forEach(size -> {
+            sizeColorQuantityMap.get(size).keySet().stream().forEach(c -> {
+                if(!colors.contains(c)) colors.add(c);
+            });
+        });
+        return colors;
     }
 }

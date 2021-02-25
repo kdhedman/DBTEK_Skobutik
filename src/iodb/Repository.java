@@ -141,17 +141,19 @@ public class Repository {
         return null;
     }
 
-    public ArrayList getfärgFromDatabase(int index, int storlek) {
+    public ArrayList getfärgFromDatabase(int skomodellID, int storlek) {
         try (Connection con = DriverManager.getConnection(
                 this.connection,
                 this.user,
                 this.password)) {
             ArrayList temp = new ArrayList();
-            Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-            ResultSet rs = stmt.executeQuery("select *  from färg " +
+            PreparedStatement stmt = con.prepareStatement("select *  from färg " +
                     "join lagermappning on färg.id = lagermappning.FärgId " +
-                    "where SkomodellId =" + index + " and " +
-                    "StorlekId =(select id from storlek where  Skostorlek = " + storlek + ")");
+                    "where SkomodellId = ? and " +
+                    "StorlekId =(select id from storlek where  Skostorlek = ?)");
+            stmt.setString(1,String.valueOf(skomodellID));
+            stmt.setString(2, String.valueOf(storlek));
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 temp.add(rs.getString("Färg"));
             }
