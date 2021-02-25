@@ -250,6 +250,7 @@ public class Store extends JPanel {
         labelLagerstatus.setText("I lager: " + lagerstatus);
         buttonAddToCart.setEnabled(lagerstatus > 0);
         buttonAddToCart.setText("Lägg i kundvagn!");
+        updateMedelbetyg();
         this.revalidate();
     }
 
