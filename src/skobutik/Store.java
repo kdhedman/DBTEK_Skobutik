@@ -43,8 +43,8 @@ public class Store extends JPanel {
     JButton buttonRate = new JButton("Åsikta dig!");
 
     public Store() {
-        setLayout(null);  // Testar annan layoutform
-        setLocationAndSize(); //Det här ingår där också, kommentera bort för gamla design.
+        setLayout(null);
+        setLocationAndSize();
         addComponents();
         editComponents();
         updateGUI();
